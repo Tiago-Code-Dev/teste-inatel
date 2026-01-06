@@ -14,16 +14,407 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      alerts: {
+        Row: {
+          acknowledged_by: string | null
+          id: string
+          machine_id: string
+          message: string
+          opened_at: string
+          probable_cause: string | null
+          reason: string | null
+          recommended_action: string | null
+          severity: string
+          status: string
+          tire_id: string | null
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          acknowledged_by?: string | null
+          id?: string
+          machine_id: string
+          message: string
+          opened_at?: string
+          probable_cause?: string | null
+          reason?: string | null
+          recommended_action?: string | null
+          severity: string
+          status?: string
+          tire_id?: string | null
+          type: string
+          updated_at?: string
+        }
+        Update: {
+          acknowledged_by?: string | null
+          id?: string
+          machine_id?: string
+          message?: string
+          opened_at?: string
+          probable_cause?: string | null
+          reason?: string | null
+          recommended_action?: string | null
+          severity?: string
+          status?: string
+          tire_id?: string | null
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alerts_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "alerts_tire_id_fkey"
+            columns: ["tire_id"]
+            isOneToOne: false
+            referencedRelation: "tires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      audit_events: {
+        Row: {
+          action: string
+          actor_id: string | null
+          created_at: string
+          entity_id: string
+          entity_type: string
+          id: string
+          metadata: Json | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id: string
+          entity_type: string
+          id?: string
+          metadata?: Json | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          created_at?: string
+          entity_id?: string
+          entity_type?: string
+          id?: string
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
+      machines: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          last_telemetry_at: string | null
+          model: string
+          name: string
+          status: string
+          unit_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          last_telemetry_at?: string | null
+          model: string
+          name: string
+          status?: string
+          unit_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          last_telemetry_at?: string | null
+          model?: string
+          name?: string
+          status?: string
+          unit_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      media_attachments: {
+        Row: {
+          created_at: string
+          duration: number | null
+          file_path: string
+          file_url: string | null
+          id: string
+          occurrence_id: string
+          retry_count: number | null
+          size: number | null
+          type: string
+          updated_at: string
+          upload_status: string
+        }
+        Insert: {
+          created_at?: string
+          duration?: number | null
+          file_path: string
+          file_url?: string | null
+          id?: string
+          occurrence_id: string
+          retry_count?: number | null
+          size?: number | null
+          type: string
+          updated_at?: string
+          upload_status?: string
+        }
+        Update: {
+          created_at?: string
+          duration?: number | null
+          file_path?: string
+          file_url?: string | null
+          id?: string
+          occurrence_id?: string
+          retry_count?: number | null
+          size?: number | null
+          type?: string
+          updated_at?: string
+          upload_status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "media_attachments_occurrence_id_fkey"
+            columns: ["occurrence_id"]
+            isOneToOne: false
+            referencedRelation: "occurrences"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      occurrences: {
+        Row: {
+          alert_id: string | null
+          created_at: string
+          created_by: string
+          description: string
+          id: string
+          is_offline_created: boolean | null
+          machine_id: string
+          status: string
+          synced_at: string | null
+          tire_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          alert_id?: string | null
+          created_at?: string
+          created_by: string
+          description: string
+          id?: string
+          is_offline_created?: boolean | null
+          machine_id: string
+          status?: string
+          synced_at?: string | null
+          tire_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          alert_id?: string | null
+          created_at?: string
+          created_by?: string
+          description?: string
+          id?: string
+          is_offline_created?: boolean | null
+          machine_id?: string
+          status?: string
+          synced_at?: string | null
+          tire_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "occurrences_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "alerts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "occurrences_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "occurrences_tire_id_fkey"
+            columns: ["tire_id"]
+            isOneToOne: false
+            referencedRelation: "tires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string
+          email: string | null
+          id: string
+          name: string
+          unit_ids: string[] | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name: string
+          unit_ids?: string[] | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          name?: string
+          unit_ids?: string[] | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      telemetry: {
+        Row: {
+          id: string
+          machine_id: string
+          pressure: number
+          seq: number
+          speed: number
+          timestamp: string
+          tire_id: string | null
+        }
+        Insert: {
+          id?: string
+          machine_id: string
+          pressure: number
+          seq: number
+          speed: number
+          timestamp?: string
+          tire_id?: string | null
+        }
+        Update: {
+          id?: string
+          machine_id?: string
+          pressure?: number
+          seq?: number
+          speed?: number
+          timestamp?: string
+          tire_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "telemetry_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "telemetry_tire_id_fkey"
+            columns: ["tire_id"]
+            isOneToOne: false
+            referencedRelation: "tires"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tires: {
+        Row: {
+          created_at: string
+          current_pressure: number | null
+          id: string
+          installed_at: string | null
+          lifecycle_status: string
+          machine_id: string | null
+          position: string | null
+          recommended_pressure: number
+          serial: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_pressure?: number | null
+          id?: string
+          installed_at?: string | null
+          lifecycle_status?: string
+          machine_id?: string | null
+          position?: string | null
+          recommended_pressure?: number
+          serial: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_pressure?: number | null
+          id?: string
+          installed_at?: string | null
+          lifecycle_status?: string
+          machine_id?: string | null
+          position?: string | null
+          recommended_pressure?: number
+          serial?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tires_machine_id_fkey"
+            columns: ["machine_id"]
+            isOneToOne: false
+            referencedRelation: "machines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          id: string
+          role: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id: string
+        }
+        Update: {
+          id?: string
+          role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role: "admin" | "manager" | "technician" | "operator"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +541,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: ["admin", "manager", "technician", "operator"],
+    },
   },
 } as const
