@@ -1,1 +1,16 @@
 project_id = "mwvtdxdzvxzmswpkeoko"
+
+[functions.telemetry-ingest]
+verify_jwt = false
+
+[functions.alerts]
+verify_jwt = false
+
+[functions.machine-timeline]
+verify_jwt = false
+
+[functions.occurrences]
+verify_jwt = false
+
+[functions.alert-actions]
+verify_jwt = false
