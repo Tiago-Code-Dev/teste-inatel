@@ -67,11 +67,14 @@ export default function NewOccurrencePage() {
 
       if (uploadError) throw uploadError;
 
-      const { data: { publicUrl } } = supabase.storage
+      // Use signed URL (4 hour expiration) instead of public URL for security
+      const { data, error: signedUrlError } = await supabase.storage
         .from('media-attachments')
-        .getPublicUrl(fileName);
+        .createSignedUrl(fileName, 14400); // 4 hours
 
-      return publicUrl;
+      if (signedUrlError) throw signedUrlError;
+
+      return data.signedUrl;
     } catch (error) {
       console.error('Upload failed:', error);
       return null;
