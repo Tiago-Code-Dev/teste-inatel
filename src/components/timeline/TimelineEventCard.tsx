@@ -1,6 +1,6 @@
 import { TimelineEvent, AlertSeverity } from '@/types';
 import { cn } from '@/lib/utils';
-import { format, isToday, isYesterday, differenceInDays } from 'date-fns';
+import { format, isToday, isYesterday, differenceInDays, differenceInHours } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { 
   AlertTriangle, 
@@ -11,7 +11,8 @@ import {
   Bell,
   Gauge,
   Info,
-  ChevronRight
+  ChevronRight,
+  Sparkles
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
@@ -21,6 +22,7 @@ export interface TimelineEventCardProps {
   isLast?: boolean;
   onClick?: () => void;
   showConnector?: boolean;
+  animationDelay?: number;
 }
 
 type EventType = TimelineEvent['type'] | 'telemetry_critical' | 'info';
@@ -30,47 +32,55 @@ const eventConfig: Record<EventType, {
   color: string;
   bgColor: string;
   label: string;
+  borderColor: string;
 }> = {
   alert: {
     icon: Bell,
     color: 'text-status-warning',
     bgColor: 'bg-status-warning/10',
+    borderColor: 'border-status-warning/20',
     label: 'Alerta',
   },
   occurrence: {
     icon: FileText,
     color: 'text-primary',
     bgColor: 'bg-primary/10',
+    borderColor: 'border-primary/20',
     label: 'Ocorrência',
   },
   maintenance: {
     icon: Wrench,
     color: 'text-status-ok',
     bgColor: 'bg-status-ok/10',
+    borderColor: 'border-status-ok/20',
     label: 'Manutenção',
   },
   installation: {
     icon: CirclePlus,
     color: 'text-status-ok',
     bgColor: 'bg-status-ok/10',
+    borderColor: 'border-status-ok/20',
     label: 'Instalação',
   },
   removal: {
     icon: CircleMinus,
     color: 'text-muted-foreground',
     bgColor: 'bg-muted',
+    borderColor: 'border-border',
     label: 'Remoção',
   },
   telemetry_critical: {
     icon: Gauge,
     color: 'text-status-critical',
     bgColor: 'bg-status-critical/10',
+    borderColor: 'border-status-critical/20',
     label: 'Telemetria Crítica',
   },
   info: {
     icon: Info,
     color: 'text-muted-foreground',
     bgColor: 'bg-muted',
+    borderColor: 'border-border',
     label: 'Informação',
   },
 };
@@ -87,10 +97,13 @@ export function TimelineEventCard({
   isFirst, 
   isLast, 
   onClick,
-  showConnector = true 
+  showConnector = true,
+  animationDelay = 0
 }: TimelineEventCardProps) {
   const config = eventConfig[event.type] || eventConfig.info;
   const Icon = config.icon;
+  const isRecent = differenceInHours(new Date(), new Date(event.timestamp)) < 6;
+  const isCritical = event.severity === 'critical' || event.id.startsWith('telemetry-');
 
   const formatEventTime = (date: Date) => {
     if (isToday(date)) {
@@ -109,9 +122,13 @@ export function TimelineEventCard({
   return (
     <div 
       className={cn(
-        'relative flex gap-4 group',
-        onClick && 'cursor-pointer'
+        'relative flex gap-4 group animate-fade-in',
+        onClick && 'cursor-pointer',
       )}
+      style={{ 
+        animationDelay: `${animationDelay}ms`,
+        animationFillMode: 'both'
+      }}
       onClick={onClick}
     >
       {/* Timeline connector */}
@@ -122,30 +139,46 @@ export function TimelineEventCard({
         </div>
       )}
 
-      {/* Icon */}
+      {/* Icon with pulse animation for critical events */}
       <div className={cn(
-        'relative z-10 flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-transform duration-200',
+        'relative z-10 flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-all duration-300',
         config.bgColor,
         onClick && 'group-hover:scale-110',
-        isFirst && 'ring-2 ring-primary/20'
+        isFirst && 'ring-2 ring-primary/20',
+        isCritical && 'animate-pulse'
       )}>
         <Icon className={cn('w-5 h-5', config.color)} />
+        {isRecent && (
+          <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
+            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
+            <span className="relative inline-flex rounded-full h-3 w-3 bg-primary" />
+          </span>
+        )}
       </div>
 
-      {/* Content Card */}
+      {/* Content Card with enhanced styling */}
       <div className={cn(
         'flex-1 pb-6 min-w-0',
         isLast && 'pb-0'
       )}>
         <div className={cn(
-          'p-4 rounded-xl border border-border bg-card transition-all duration-200',
-          onClick && 'group-hover:border-primary/30 group-hover:shadow-md',
-          isFirst && 'border-primary/20 shadow-sm'
+          'p-4 rounded-xl border bg-card transition-all duration-300',
+          config.borderColor,
+          onClick && 'group-hover:border-primary/40 group-hover:shadow-lg group-hover:-translate-y-0.5',
+          isFirst && 'shadow-sm border-primary/20',
+          isCritical && 'border-status-critical/30 shadow-status-critical/5'
         )}>
           {/* Header */}
           <div className="flex items-start justify-between gap-3 mb-2">
             <div className="flex items-center gap-2 flex-wrap">
-              <Badge variant="outline" className={cn('text-xs font-medium', config.color)}>
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  'text-xs font-medium transition-colors', 
+                  config.color,
+                  config.bgColor
+                )}
+              >
                 {config.label}
               </Badge>
               {event.severity && (
@@ -155,9 +188,15 @@ export function TimelineEventCard({
                    event.severity === 'medium' ? 'Médio' : 'Baixo'}
                 </Badge>
               )}
+              {isRecent && (
+                <Badge className="text-xs bg-primary/10 text-primary gap-1">
+                  <Sparkles className="w-3 h-3" />
+                  Novo
+                </Badge>
+              )}
             </div>
             {onClick && (
-              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:text-primary transition-colors" />
+              <ChevronRight className="w-4 h-4 text-muted-foreground shrink-0 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
             )}
           </div>
 

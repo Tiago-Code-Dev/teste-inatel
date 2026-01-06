@@ -7,7 +7,8 @@ import {
   TimelineContainer, 
   TimeRangeSelector, 
   EventTypeFilter, 
-  ExportButton 
+  ExportButton,
+  EventDetailSheet
 } from '@/components/timeline';
 import { useTireTimeline } from '@/hooks/useTireTimeline';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -27,6 +28,8 @@ import {
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
+import { useState, useCallback } from 'react';
+import { TimelineEvent } from '@/types';
 
 const lifecycleLabels: Record<string, { label: string; className: string }> = {
   new: { label: 'Novo', className: 'bg-status-ok/15 text-status-ok' },
@@ -39,6 +42,8 @@ export default function TireHistoryPage() {
   const { id: tireId } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
+  const [isEventDetailOpen, setIsEventDetailOpen] = useState(false);
 
   // Fetch tire details
   const { data: tire, isLoading: tireLoading, error: tireError } = useQuery({
@@ -65,12 +70,24 @@ export default function TireHistoryPage() {
     timeRange,
     customRange,
     eventTypeFilter,
+    eventCounts,
     setTimeRange,
     setEventTypeFilter,
     refetch,
+    isRefetching,
   } = useTireTimeline({ tireId: tireId || '' });
 
   const handleBack = () => navigate(-1);
+
+  const handleEventClick = useCallback((event: TimelineEvent) => {
+    setSelectedEvent(event);
+    setIsEventDetailOpen(true);
+  }, []);
+
+  const handleCreateOccurrence = useCallback((event: TimelineEvent) => {
+    const alertId = event.id.startsWith('alert-') ? event.id.replace('alert-', '') : undefined;
+    navigate(`/occurrences/new?tireId=${tireId}&alertId=${alertId}`);
+  }, [navigate, tireId]);
 
   if (tireLoading) {
     return isMobile ? (
@@ -195,6 +212,7 @@ export default function TireHistoryPage() {
       <EventTypeFilter
         selected={eventTypeFilter}
         onChange={setEventTypeFilter}
+        eventCounts={eventCounts}
       />
     </div>
   );
@@ -210,9 +228,9 @@ export default function TireHistoryPage() {
           variant="ghost" 
           size="sm" 
           onClick={refetch}
-          disabled={timelineLoading}
+          disabled={timelineLoading || isRefetching}
         >
-          <RefreshCw className={cn('w-4 h-4', timelineLoading && 'animate-spin')} />
+          <RefreshCw className={cn('w-4 h-4', (timelineLoading || isRefetching) && 'animate-spin')} />
         </Button>
       </div>
       <ExportButton 
@@ -246,9 +264,17 @@ export default function TireHistoryPage() {
             isOffline={isOffline}
             error={timelineError}
             onRetry={refetch}
+            onEventClick={handleEventClick}
             showDateSeparators
           />
         </div>
+
+        <EventDetailSheet
+          event={selectedEvent}
+          open={isEventDetailOpen}
+          onOpenChange={setIsEventDetailOpen}
+          onCreateOccurrence={handleCreateOccurrence}
+        />
       </MobileLayout>
     );
   }
@@ -292,11 +318,19 @@ export default function TireHistoryPage() {
               isOffline={isOffline}
               error={timelineError}
               onRetry={refetch}
+              onEventClick={handleEventClick}
               showDateSeparators
             />
           </Card>
         </div>
       </div>
+
+      <EventDetailSheet
+        event={selectedEvent}
+        open={isEventDetailOpen}
+        onOpenChange={setIsEventDetailOpen}
+        onCreateOccurrence={handleCreateOccurrence}
+      />
     </MainLayout>
   );
 }
