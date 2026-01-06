@@ -15,6 +15,7 @@ import AlertsPage from "./pages/AlertsPage";
 import OccurrencesPage from "./pages/OccurrencesPage";
 import TiresPage from "./pages/TiresPage";
 import TireHistoryPage from "./pages/TireHistoryPage";
+import TelemetryAnalysisPage from "./pages/TelemetryAnalysisPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
             <Route path="/occurrences" element={<OccurrencesPage />} />
             <Route path="/tires" element={<TiresPage />} />
             <Route path="/tires/:id/history" element={<TireHistoryPage />} />
+            <Route path="/telemetry" element={<TelemetryAnalysisPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Route>

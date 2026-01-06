@@ -1,12 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Truck, AlertTriangle, FileText, User } from 'lucide-react';
+import { Truck, AlertTriangle, FileText, User, Activity } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const navigation = [
   { name: 'Operação', href: '/', icon: Truck },
+  { name: 'Telemetria', href: '/telemetry', icon: Activity },
   { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: true },
-  { name: 'Ocorrências', href: '/occurrences', icon: FileText },
   { name: 'Perfil', href: '/profile', icon: User },
 ];
 
