@@ -3,6 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
+
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
+
+import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import MachinesPage from "./pages/MachinesPage";
 import MachineDetailPage from "./pages/MachineDetailPage";
@@ -21,15 +25,19 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/machines" element={<MachinesPage />} />
-          <Route path="/machines/:id" element={<MachineDetailPage />} />
-          <Route path="/alerts" element={<AlertsPage />} />
-          <Route path="/occurrences" element={<OccurrencesPage />} />
-          <Route path="/tires" element={<TiresPage />} />
-          <Route path="/tires/:id/history" element={<TireHistoryPage />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
+          <Route path="/auth" element={<AuthPage />} />
+
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Dashboard />} />
+            <Route path="/machines" element={<MachinesPage />} />
+            <Route path="/machines/:id" element={<MachineDetailPage />} />
+            <Route path="/alerts" element={<AlertsPage />} />
+            <Route path="/occurrences" element={<OccurrencesPage />} />
+            <Route path="/tires" element={<TiresPage />} />
+            <Route path="/tires/:id/history" element={<TireHistoryPage />} />
+            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="*" element={<NotFound />} />
+          </Route>
         </Routes>
       </BrowserRouter>
     </TooltipProvider>
@@ -37,3 +45,4 @@ const App = () => (
 );
 
 export default App;
+
