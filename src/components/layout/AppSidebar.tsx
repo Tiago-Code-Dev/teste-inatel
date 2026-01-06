@@ -8,7 +8,8 @@ import {
   LogOut,
   Bell,
   ChevronRight,
-  Activity
+  Activity,
+  Command
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -17,6 +18,7 @@ import { currentUser, dashboardStats } from '@/data/mockData';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Centro de Operações', href: '/command-center', icon: Command, badge: 3 },
   { name: 'Máquinas', href: '/machines', icon: Truck },
   { name: 'Telemetria', href: '/telemetry', icon: Activity },
   { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: 7 },

@@ -9,6 +9,7 @@ import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import OperationalDashboardPage from "./pages/OperationalDashboardPage";
+import CommandCenterPage from "./pages/CommandCenterPage";
 import MachinesPage from "./pages/MachinesPage";
 import MachineDetailPage from "./pages/MachineDetailPage";
 import AlertsPage from "./pages/AlertsPage";
@@ -32,6 +33,7 @@ const App = () => (
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Dashboard />} />
             <Route path="/operations" element={<OperationalDashboardPage />} />
+            <Route path="/command-center" element={<CommandCenterPage />} />
             <Route path="/machines" element={<MachinesPage />} />
             <Route path="/machines/:id" element={<MachineDetailPage />} />
             <Route path="/alerts" element={<AlertsPage />} />
