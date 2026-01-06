@@ -5,12 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { useState, useEffect } from 'react';
 
 interface TopBarProps {
-  title: string;
+  title?: string;
   subtitle?: string;
+  showBackButton?: boolean;
   onMenuClick?: () => void;
 }
 
-export function TopBar({ title, subtitle, onMenuClick }: TopBarProps) {
+export function TopBar({ title, subtitle, showBackButton, onMenuClick }: TopBarProps) {
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [lastSync, setLastSync] = useState(new Date());
 
