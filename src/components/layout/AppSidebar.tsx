@@ -9,7 +9,8 @@ import {
   Bell,
   ChevronRight,
   Activity,
-  Command
+  Command,
+  TrendingUp
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Centro de Operações', href: '/command-center', icon: Command, badge: 3 },
   { name: 'Máquinas', href: '/machines', icon: Truck },
   { name: 'Telemetria', href: '/telemetry', icon: Activity },
+  { name: 'Desgaste', href: '/wear', icon: TrendingUp },
   { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: 7 },
   { name: 'Ocorrências', href: '/occurrences', icon: FileText, badge: 4 },
   { name: 'Pneus', href: '/tires', icon: CircleDot },
