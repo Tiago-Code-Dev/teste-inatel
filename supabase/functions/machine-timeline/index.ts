@@ -15,6 +15,8 @@ interface TimelineEvent {
   metadata?: Record<string, any>
 }
 
+const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+
 Deno.serve(async (req) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -29,46 +31,91 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
+    // Require authentication
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Create authenticated client for RLS enforcement
+    const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } }
     )
+
+    // Validate the token
+    const token = authHeader.replace('Bearer ', '')
+    const { data: claims, error: authError } = await supabaseAuth.auth.getClaims(token)
+    
+    if (authError || !claims?.claims?.sub) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid or expired token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     const url = new URL(req.url)
     const pathParts = url.pathname.split('/')
     const machineId = url.searchParams.get('machineId') || pathParts[pathParts.length - 1]
     
-    if (!machineId || machineId === 'machine-timeline') {
+    // Validate machineId format
+    if (!machineId || machineId === 'machine-timeline' || !uuidRegex.test(machineId)) {
       return new Response(
-        JSON.stringify({ error: 'Machine ID is required' }),
+        JSON.stringify({ error: 'Valid Machine ID is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
     const startDate = url.searchParams.get('startDate')
     const endDate = url.searchParams.get('endDate')
-    const eventTypes = url.searchParams.get('eventTypes')?.split(',') || ['alert', 'occurrence', 'telemetry']
-    const limit = parseInt(url.searchParams.get('limit') || '100')
+    
+    // Validate date formats
+    if (startDate && isNaN(Date.parse(startDate))) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid startDate format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    if (endDate && isNaN(Date.parse(endDate))) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid endDate format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const eventTypesParam = url.searchParams.get('eventTypes')
+    const validEventTypes = ['alert', 'occurrence', 'telemetry']
+    let eventTypes = eventTypesParam?.split(',').filter(t => validEventTypes.includes(t)) || validEventTypes
+    if (eventTypes.length === 0) {
+      eventTypes = validEventTypes
+    }
+
+    const limitParam = url.searchParams.get('limit')
+    const limit = Math.min(Math.max(parseInt(limitParam || '100', 10) || 100, 1), 500)
 
     const timeline: TimelineEvent[] = []
 
-    // Fetch machine info
-    const { data: machine } = await supabase
+    // Fetch machine info using authenticated client (RLS enforced)
+    const { data: machine, error: machineError } = await supabaseAuth
       .from('machines')
       .select('*')
       .eq('id', machineId)
       .single()
 
-    if (!machine) {
+    if (machineError || !machine) {
       return new Response(
         JSON.stringify({ error: 'Machine not found' }),
         { status: 404, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Fetch alerts
+    // Fetch alerts using authenticated client
     if (eventTypes.includes('alert')) {
-      let alertQuery = supabase
+      let alertQuery = supabaseAuth
         .from('alerts')
         .select('*, tires:tire_id(serial, position)')
         .eq('machine_id', machineId)
@@ -102,9 +149,9 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Fetch occurrences
+    // Fetch occurrences using authenticated client
     if (eventTypes.includes('occurrence')) {
-      let occurrenceQuery = supabase
+      let occurrenceQuery = supabaseAuth
         .from('occurrences')
         .select('*, tires:tire_id(serial, position)')
         .eq('machine_id', machineId)
@@ -136,9 +183,9 @@ Deno.serve(async (req) => {
       })
     }
 
-    // Fetch critical telemetry (anomalies only)
+    // Fetch critical telemetry (anomalies only) using authenticated client
     if (eventTypes.includes('telemetry')) {
-      let telemetryQuery = supabase
+      let telemetryQuery = supabaseAuth
         .from('telemetry')
         .select('*, tires:tire_id(serial, position)')
         .eq('machine_id', machineId)
@@ -198,7 +245,7 @@ Deno.serve(async (req) => {
     // Limit results
     const limitedTimeline = timeline.slice(0, limit)
 
-    console.log(`Fetched ${limitedTimeline.length} timeline events for machine ${machineId}`)
+    console.log(`Fetched ${limitedTimeline.length} timeline events for machine ${machineId} by user ${claims.claims.sub}`)
 
     return new Response(
       JSON.stringify({
@@ -217,9 +264,8 @@ Deno.serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Timeline fetch error:', error)
-    const message = error instanceof Error ? error.message : 'Internal server error'
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: 'Failed to process request' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }

@@ -19,10 +19,32 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
+    // Require authentication
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader?.startsWith('Bearer ')) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Create authenticated client for RLS enforcement
+    const supabaseAuth = createClient(
       Deno.env.get('SUPABASE_URL')!,
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
+      Deno.env.get('SUPABASE_ANON_KEY')!,
+      { global: { headers: { Authorization: authHeader } } }
     )
+
+    // Validate the token
+    const token = authHeader.replace('Bearer ', '')
+    const { data: claims, error: authError } = await supabaseAuth.auth.getClaims(token)
+    
+    if (authError || !claims?.claims?.sub) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid or expired token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     const url = new URL(req.url)
     const severity = url.searchParams.get('severity')
@@ -31,10 +53,62 @@ Deno.serve(async (req) => {
     const machineId = url.searchParams.get('machineId')
     const startDate = url.searchParams.get('startDate')
     const endDate = url.searchParams.get('endDate')
-    const limit = parseInt(url.searchParams.get('limit') || '100')
-    const offset = parseInt(url.searchParams.get('offset') || '0')
+    
+    // Validate and sanitize pagination params
+    const limitParam = url.searchParams.get('limit')
+    const offsetParam = url.searchParams.get('offset')
+    const limit = Math.min(Math.max(parseInt(limitParam || '100', 10) || 100, 1), 500)
+    const offset = Math.max(parseInt(offsetParam || '0', 10) || 0, 0)
 
-    let query = supabase
+    // Validate UUID format for machineId if provided
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i
+    if (machineId && !uuidRegex.test(machineId)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid machine ID format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Validate date formats
+    if (startDate && isNaN(Date.parse(startDate))) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid startDate format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    if (endDate && isNaN(Date.parse(endDate))) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid endDate format' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Validate enum values
+    const validSeverities = ['critical', 'high', 'medium', 'low']
+    const validStatuses = ['open', 'acknowledged', 'in_progress', 'resolved']
+    const validTypes = ['pressure_low', 'pressure_high', 'speed_exceeded', 'no_signal', 'anomaly']
+    
+    if (severity && !validSeverities.includes(severity)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid severity value' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    if (status && !validStatuses.includes(status)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid status value' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+    if (type && !validTypes.includes(type)) {
+      return new Response(
+        JSON.stringify({ error: 'Invalid type value' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Use authenticated client - RLS policies will be enforced
+    let query = supabaseAuth
       .from('alerts')
       .select(`
         *,
@@ -77,7 +151,7 @@ Deno.serve(async (req) => {
 
     if (error) {
       console.error('Alerts query error:', error)
-      throw new Error(`Failed to fetch alerts: ${error.message}`)
+      throw new Error('Failed to fetch alerts')
     }
 
     // Transform data for API response
@@ -102,8 +176,8 @@ Deno.serve(async (req) => {
       acknowledgedBy: alert.acknowledged_by
     })) || []
 
-    // Get summary counts
-    const { data: counts } = await supabase
+    // Get summary counts with authenticated client
+    const { data: counts } = await supabaseAuth
       .from('alerts')
       .select('severity, status')
     
@@ -123,7 +197,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    console.log(`Fetched ${transformedAlerts.length} alerts`)
+    console.log(`Fetched ${transformedAlerts.length} alerts for user ${claims.claims.sub}`)
 
     return new Response(
       JSON.stringify({
@@ -141,9 +215,8 @@ Deno.serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Alerts fetch error:', error)
-    const message = error instanceof Error ? error.message : 'Internal server error'
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: 'Failed to process request' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
