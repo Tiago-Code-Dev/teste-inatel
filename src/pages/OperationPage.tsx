@@ -131,16 +131,14 @@ const OperationPage = () => {
             title="Alertas Ativos"
             value={openAlerts}
             icon={AlertTriangle}
-            trend={criticalAlerts > 0 ? 'down' : 'up'}
-            trendValue={criticalAlerts > 0 ? `${criticalAlerts} críticos` : 'Nenhum crítico'}
-            className={criticalAlerts > 0 ? 'border-status-critical/30' : ''}
+            trend={criticalAlerts > 0 ? { value: -criticalAlerts, label: `${criticalAlerts} críticos` } : undefined}
+            variant={criticalAlerts > 0 ? 'danger' : 'default'}
           />
           <MetricCard
             title="Ocorrências"
             value={openOccurrences}
             icon={FileText}
-            trend="neutral"
-            trendValue="Em aberto"
+            subtitle="Em aberto"
           />
         </div>
 
