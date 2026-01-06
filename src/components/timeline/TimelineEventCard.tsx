@@ -15,12 +15,13 @@ import {
   Sparkles
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
 
 export interface TimelineEventCardProps {
   event: TimelineEvent;
   isFirst?: boolean;
   isLast?: boolean;
-  onClick?: () => void;
+  onClick?: (event: TimelineEvent) => void;
   showConnector?: boolean;
   animationDelay?: number;
 }
@@ -119,17 +120,25 @@ export function TimelineEventCard({
     return format(date, "dd MMM yyyy 'às' HH:mm", { locale: ptBR });
   };
 
+  const handleClick = () => {
+    if (onClick) onClick(event);
+  };
+
   return (
-    <div 
+    <motion.div 
       className={cn(
-        'relative flex gap-4 group animate-fade-in',
+        'relative flex gap-4 group',
         onClick && 'cursor-pointer',
       )}
-      style={{ 
-        animationDelay: `${animationDelay}ms`,
-        animationFillMode: 'both'
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ 
+        duration: 0.3, 
+        delay: animationDelay / 1000,
+        ease: 'easeOut'
       }}
-      onClick={onClick}
+      whileHover={onClick ? { x: 4 } : {}}
+      onClick={handleClick}
     >
       {/* Timeline connector */}
       {showConnector && (
@@ -140,13 +149,19 @@ export function TimelineEventCard({
       )}
 
       {/* Icon with pulse animation for critical events */}
-      <div className={cn(
-        'relative z-10 flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-all duration-300',
-        config.bgColor,
-        onClick && 'group-hover:scale-110',
-        isFirst && 'ring-2 ring-primary/20',
-        isCritical && 'animate-pulse'
-      )}>
+      <motion.div 
+        className={cn(
+          'relative z-10 flex items-center justify-center w-10 h-10 rounded-full shrink-0 transition-colors duration-300',
+          config.bgColor,
+          isFirst && 'ring-2 ring-primary/20',
+        )}
+        whileHover={onClick ? { scale: 1.1 } : {}}
+        animate={isCritical ? { 
+          scale: [1, 1.05, 1],
+          boxShadow: ['0 0 0 0 rgba(239,68,68,0)', '0 0 0 6px rgba(239,68,68,0.2)', '0 0 0 0 rgba(239,68,68,0)']
+        } : {}}
+        transition={isCritical ? { repeat: Infinity, duration: 2 } : {}}
+      >
         <Icon className={cn('w-5 h-5', config.color)} />
         {isRecent && (
           <span className="absolute -top-0.5 -right-0.5 flex h-3 w-3">
@@ -154,20 +169,26 @@ export function TimelineEventCard({
             <span className="relative inline-flex rounded-full h-3 w-3 bg-primary" />
           </span>
         )}
-      </div>
+      </motion.div>
 
       {/* Content Card with enhanced styling */}
       <div className={cn(
         'flex-1 pb-6 min-w-0',
         isLast && 'pb-0'
       )}>
-        <div className={cn(
-          'p-4 rounded-xl border bg-card transition-all duration-300',
-          config.borderColor,
-          onClick && 'group-hover:border-primary/40 group-hover:shadow-lg group-hover:-translate-y-0.5',
-          isFirst && 'shadow-sm border-primary/20',
-          isCritical && 'border-status-critical/30 shadow-status-critical/5'
-        )}>
+        <motion.div 
+          className={cn(
+            'p-4 rounded-xl border bg-card transition-colors duration-300',
+            config.borderColor,
+            onClick && 'group-hover:border-primary/40',
+            isFirst && 'shadow-sm border-primary/20',
+            isCritical && 'border-status-critical/30 shadow-status-critical/5'
+          )}
+          whileHover={onClick ? { 
+            y: -2,
+            boxShadow: '0 10px 20px -10px rgba(0,0,0,0.1)'
+          } : {}}
+        >
           {/* Header */}
           <div className="flex items-start justify-between gap-3 mb-2">
             <div className="flex items-center gap-2 flex-wrap">
@@ -212,8 +233,8 @@ export function TimelineEventCard({
           <time className="block mt-3 text-xs text-muted-foreground capitalize">
             {formatEventTime(event.timestamp)}
           </time>
-        </div>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

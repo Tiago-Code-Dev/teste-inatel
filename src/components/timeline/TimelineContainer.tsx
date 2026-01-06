@@ -132,7 +132,7 @@ export function TimelineContainer({
               event={event}
               isFirst={index === 0}
               isLast={index === sortedEvents.length - 1}
-              onClick={onEventClick ? () => onEventClick(event) : undefined}
+              onClick={onEventClick}
               showConnector={!showDateSeparators}
               animationDelay={index * 50}
             />
