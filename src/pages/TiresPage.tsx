@@ -34,10 +34,11 @@ const TiresPage = () => {
           const lifecycle = lifecycleLabels[tire.lifecycleStatus];
 
           return (
-            <div 
+            <Link
               key={tire.id}
+              to={`/tires/${tire.id}/history`}
               className={cn(
-                'card-elevated p-5',
+                'card-interactive p-5 block',
                 isLow && 'border-status-critical/50'
               )}
             >
@@ -86,13 +87,10 @@ const TiresPage = () => {
 
               {/* Machine Link */}
               {tire.machine && (
-                <Link 
-                  to={`/machines/${tire.machine.id}`}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
-                >
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Truck className="w-4 h-4" />
                   {tire.machine.name}
-                </Link>
+                </div>
               )}
 
               {/* Install Date */}
@@ -100,7 +98,7 @@ const TiresPage = () => {
                 <Calendar className="w-3 h-3" />
                 Instalado em {format(tire.installedAt, 'dd/MM/yyyy', { locale: ptBR })}
               </div>
-            </div>
+            </Link>
           );
         })}
       </div>
