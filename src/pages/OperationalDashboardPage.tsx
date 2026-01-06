@@ -17,6 +17,9 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
+import { useRealtimeAlerts } from '@/hooks/useRealtimeAlerts';
+import { useRealtimeMachines } from '@/hooks/useRealtimeMachines';
+import { useRealtimeOccurrences } from '@/hooks/useRealtimeOccurrences';
 import { toast } from 'sonner';
 import { 
   Truck,
@@ -84,6 +87,11 @@ const OperationalDashboardPage = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const isOnline = useOnlineStatus();
+
+  // Real-time subscriptions
+  useRealtimeAlerts();
+  useRealtimeMachines();
+  useRealtimeOccurrences();
 
   // Filter state
   const [selectedSeverities, setSelectedSeverities] = useState<AlertSeverity[]>([]);
