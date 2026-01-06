@@ -20,9 +20,11 @@ interface TireTimelineResult {
   timeRange: TimeRangeOption;
   customRange: { from: Date; to: Date } | undefined;
   eventTypeFilter: EventTypeOption[];
+  eventCounts: Record<EventTypeOption, number>;
   setTimeRange: (range: TimeRangeOption, custom?: { from: Date; to: Date }) => void;
   setEventTypeFilter: (types: EventTypeOption[]) => void;
   refetch: () => void;
+  isRefetching: boolean;
 }
 
 function getDateRangeFromOption(option: TimeRangeOption, customRange?: { from: Date; to: Date }): { from: Date; to: Date } {
@@ -56,7 +58,13 @@ export function useTireTimeline({ tireId, initialTimeRange = '7d' }: UseTireTime
   );
 
   // Fetch alerts for this tire
-  const { data: alertsData, isLoading: alertsLoading, error: alertsError, refetch: refetchAlerts } = useQuery({
+  const { 
+    data: alertsData, 
+    isLoading: alertsLoading, 
+    error: alertsError, 
+    refetch: refetchAlerts,
+    isRefetching: alertsRefetching 
+  } = useQuery({
     queryKey: ['tire-alerts', tireId, dateRange.from.toISOString(), dateRange.to.toISOString()],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -74,7 +82,13 @@ export function useTireTimeline({ tireId, initialTimeRange = '7d' }: UseTireTime
   });
 
   // Fetch occurrences for this tire
-  const { data: occurrencesData, isLoading: occurrencesLoading, error: occurrencesError, refetch: refetchOccurrences } = useQuery({
+  const { 
+    data: occurrencesData, 
+    isLoading: occurrencesLoading, 
+    error: occurrencesError, 
+    refetch: refetchOccurrences,
+    isRefetching: occurrencesRefetching 
+  } = useQuery({
     queryKey: ['tire-occurrences', tireId, dateRange.from.toISOString(), dateRange.to.toISOString()],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -92,7 +106,13 @@ export function useTireTimeline({ tireId, initialTimeRange = '7d' }: UseTireTime
   });
 
   // Fetch critical telemetry readings for this tire
-  const { data: telemetryData, isLoading: telemetryLoading, error: telemetryError, refetch: refetchTelemetry } = useQuery({
+  const { 
+    data: telemetryData, 
+    isLoading: telemetryLoading, 
+    error: telemetryError, 
+    refetch: refetchTelemetry,
+    isRefetching: telemetryRefetching 
+  } = useQuery({
     queryKey: ['tire-telemetry-critical', tireId, dateRange.from.toISOString(), dateRange.to.toISOString()],
     queryFn: async () => {
       // Get tire to check recommended pressure
@@ -148,11 +168,11 @@ export function useTireTimeline({ tireId, initialTimeRange = '7d' }: UseTireTime
       });
     });
 
-    // Convert critical telemetry to timeline events (group by significant pressure drops)
+    // Convert critical telemetry to timeline events
     telemetryData?.forEach(reading => {
       timelineEvents.push({
         id: `telemetry-${reading.id}`,
-        type: 'alert', // Use alert type for critical telemetry since telemetry_critical is not in TimelineEvent['type']
+        type: 'alert', // Use alert type for critical telemetry
         title: 'Telemetria crítica detectada',
         description: `Pressão registrada em ${Number(reading.pressure).toFixed(1)} PSI - abaixo do limite seguro`,
         timestamp: new Date(reading.timestamp),
@@ -162,6 +182,30 @@ export function useTireTimeline({ tireId, initialTimeRange = '7d' }: UseTireTime
 
     return timelineEvents;
   }, [alertsData, occurrencesData, telemetryData]);
+
+  // Calculate event counts for filters
+  const eventCounts = useMemo<Record<EventTypeOption, number>>(() => {
+    const counts: Record<EventTypeOption, number> = {
+      all: events.length,
+      alert: 0,
+      occurrence: 0,
+      maintenance: 0,
+      installation: 0,
+      removal: 0,
+      telemetry_critical: 0,
+      info: 0,
+    };
+
+    events.forEach(event => {
+      if (event.id.startsWith('telemetry-')) {
+        counts.telemetry_critical++;
+      } else if (event.type in counts) {
+        counts[event.type as EventTypeOption]++;
+      }
+    });
+
+    return counts;
+  }, [events]);
 
   // Filter events by type
   const filteredEvents = useMemo(() => {
@@ -192,6 +236,7 @@ export function useTireTimeline({ tireId, initialTimeRange = '7d' }: UseTireTime
   }, [refetchAlerts, refetchOccurrences, refetchTelemetry]);
 
   const isLoading = alertsLoading || occurrencesLoading || telemetryLoading;
+  const isRefetching = alertsRefetching || occurrencesRefetching || telemetryRefetching;
   const error = alertsError || occurrencesError || telemetryError;
 
   return {
@@ -203,8 +248,10 @@ export function useTireTimeline({ tireId, initialTimeRange = '7d' }: UseTireTime
     timeRange,
     customRange,
     eventTypeFilter,
+    eventCounts,
     setTimeRange,
     setEventTypeFilter,
     refetch,
+    isRefetching,
   };
 }

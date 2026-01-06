@@ -10,3 +10,5 @@ export { EventTypeFilter } from './EventTypeFilter';
 export type { EventTypeOption } from './EventTypeFilter';
 
 export { ExportButton } from './ExportButton';
+
+export { EventDetailSheet } from './EventDetailSheet';

@@ -30,11 +30,19 @@ function TimelineSkeleton() {
   return (
     <div className="space-y-6">
       {[1, 2, 3, 4].map((i) => (
-        <div key={i} className="flex gap-4 animate-pulse">
+        <div 
+          key={i} 
+          className="flex gap-4"
+          style={{ 
+            animationDelay: `${i * 100}ms`,
+            opacity: 0,
+            animation: `fade-in 0.5s ease-out ${i * 100}ms forwards`
+          }}
+        >
           <Skeleton className="w-10 h-10 rounded-full shrink-0" />
           <div className="flex-1 space-y-3">
             <Skeleton className="h-4 w-24" />
-            <Skeleton className="h-20 w-full rounded-xl" />
+            <Skeleton className="h-24 w-full rounded-xl" />
           </div>
         </div>
       ))}
@@ -84,7 +92,7 @@ export function TimelineContainer({
       <StateDisplay
         state="empty"
         title="Nenhum evento registrado"
-        description="Não há eventos no histórico deste pneu. Eventos serão registrados automaticamente conforme o uso."
+        description="Não há eventos no histórico deste pneu para o período selecionado. Eventos serão registrados automaticamente conforme o uso."
       />
     );
   }
@@ -106,14 +114,17 @@ export function TimelineContainer({
 
         return (
           <div key={event.id}>
-            {/* Date Separator */}
+            {/* Date Separator with animation */}
             {showSeparator && (
-              <div className="flex items-center gap-3 mb-4 mt-2">
-                <div className="h-px flex-1 bg-border" />
-                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-2 capitalize">
+              <div 
+                className="flex items-center gap-3 mb-4 mt-2 animate-fade-in"
+                style={{ animationDelay: `${index * 50}ms` }}
+              >
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
+                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wider px-3 py-1 rounded-full bg-muted/50 capitalize">
                   {currentDateLabel}
                 </span>
-                <div className="h-px flex-1 bg-border" />
+                <div className="h-px flex-1 bg-gradient-to-r from-transparent via-border to-transparent" />
               </div>
             )}
 
@@ -123,6 +134,7 @@ export function TimelineContainer({
               isLast={index === sortedEvents.length - 1}
               onClick={onEventClick ? () => onEventClick(event) : undefined}
               showConnector={!showDateSeparators}
+              animationDelay={index * 50}
             />
           </div>
         );
