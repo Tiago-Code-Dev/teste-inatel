@@ -1,22 +1,24 @@
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import { z } from 'https://esm.sh/zod@3.23.8'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-api-key',
 }
 
-interface TelemetryPayload {
-  machineId: string
-  tireId?: string
-  pressure: number
-  speed: number
-  timestamp?: string
-  seq?: number
-}
+// Validation schemas
+const TelemetryReadingSchema = z.object({
+  machineId: z.string().uuid('Invalid machine ID format'),
+  tireId: z.string().uuid('Invalid tire ID format').optional(),
+  pressure: z.number().min(0, 'Pressure must be positive').max(10, 'Pressure exceeds maximum'),
+  speed: z.number().min(0, 'Speed must be positive').max(200, 'Speed exceeds maximum'),
+  timestamp: z.string().datetime().optional(),
+  seq: z.number().int().positive().optional()
+})
 
-interface TelemetryBatch {
-  readings: TelemetryPayload[]
-}
+const TelemetryBatchSchema = z.object({
+  readings: z.array(TelemetryReadingSchema).min(1).max(1000)
+})
 
 Deno.serve(async (req) => {
   // Handle CORS preflight
@@ -32,34 +34,108 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // For telemetry ingestion from IoT devices, we support:
+    // 1. API key authentication (for devices)
+    // 2. JWT authentication (for authenticated users/services)
+    const authHeader = req.headers.get('Authorization')
+    const apiKey = req.headers.get('x-api-key')
+    
+    // Initialize Supabase client - service role for IoT ingestion
     const supabase = createClient(
       Deno.env.get('SUPABASE_URL')!,
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
     )
 
+    // Validate authentication - either JWT or API key required
+    let authenticatedSource = 'unknown'
+    
+    if (apiKey) {
+      // For IoT devices: validate API key matches configured secret
+      const expectedApiKey = Deno.env.get('TELEMETRY_API_KEY')
+      if (!expectedApiKey || apiKey !== expectedApiKey) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid API key' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      authenticatedSource = 'api_key'
+    } else if (authHeader?.startsWith('Bearer ')) {
+      // For authenticated services/users: validate JWT
+      const token = authHeader.replace('Bearer ', '')
+      const { data: claims, error: authError } = await supabase.auth.getClaims(token)
+      
+      if (authError || !claims?.claims?.sub) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid or expired token' }),
+          { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      authenticatedSource = `user:${claims.claims.sub}`
+    } else {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required. Provide Authorization header or x-api-key' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
     const body = await req.json()
     
-    // Support both single reading and batch
-    const readings: TelemetryPayload[] = body.readings || [body]
+    // Support both single reading and batch - validate with Zod
+    let readings
+    try {
+      if (body.readings) {
+        const validated = TelemetryBatchSchema.parse(body)
+        readings = validated.readings
+      } else {
+        const validated = TelemetryReadingSchema.parse(body)
+        readings = [validated]
+      }
+    } catch (validationError) {
+      if (validationError instanceof z.ZodError) {
+        return new Response(
+          JSON.stringify({ 
+            error: 'Validation failed', 
+            details: validationError.errors.map(e => ({
+              field: e.path.join('.'),
+              message: e.message
+            }))
+          }),
+          { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
+      }
+      throw validationError
+    }
+
+    // Validate that machineIds exist before processing
+    const uniqueMachineIds = [...new Set(readings.map(r => r.machineId))]
+    const { data: validMachines, error: machineError } = await supabase
+      .from('machines')
+      .select('id')
+      .in('id', uniqueMachineIds)
+
+    if (machineError) {
+      throw new Error('Failed to validate machines')
+    }
+
+    const validMachineIds = new Set(validMachines?.map(m => m.id) || [])
+    const invalidMachines = uniqueMachineIds.filter(id => !validMachineIds.has(id))
     
-    if (!readings.length) {
+    if (invalidMachines.length > 0) {
       return new Response(
-        JSON.stringify({ error: 'No telemetry data provided' }),
+        JSON.stringify({ 
+          error: 'Invalid machine IDs', 
+          invalidIds: invalidMachines 
+        }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    // Validate and prepare telemetry records
+    // Prepare validated telemetry records
     const telemetryRecords = []
     const alertsToCreate = []
     const machineUpdates = new Map<string, { pressure: number, speed: number, timestamp: string }>()
 
     for (const reading of readings) {
-      if (!reading.machineId || reading.pressure === undefined || reading.speed === undefined) {
-        console.warn('Invalid telemetry reading:', reading)
-        continue
-      }
-
       const timestamp = reading.timestamp || new Date().toISOString()
       const seq = reading.seq || Date.now()
 
@@ -127,11 +203,12 @@ Deno.serve(async (req) => {
       action: 'ingest',
       metadata: { 
         count: telemetryRecords.length,
-        alerts_generated: alertsToCreate.length
+        alerts_generated: alertsToCreate.length,
+        source: authenticatedSource
       }
     })
 
-    console.log(`Processed ${telemetryRecords.length} telemetry readings, generated ${alertsToCreate.length} alerts`)
+    console.log(`[${authenticatedSource}] Processed ${telemetryRecords.length} telemetry readings, generated ${alertsToCreate.length} alerts`)
 
     return new Response(
       JSON.stringify({
@@ -145,15 +222,14 @@ Deno.serve(async (req) => {
 
   } catch (error: unknown) {
     console.error('Telemetry ingest error:', error)
-    const message = error instanceof Error ? error.message : 'Internal server error'
     return new Response(
-      JSON.stringify({ error: message }),
+      JSON.stringify({ error: 'Processing failed' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }
 })
 
-function generateAlerts(reading: TelemetryPayload, timestamp: string): any[] {
+function generateAlerts(reading: z.infer<typeof TelemetryReadingSchema>, timestamp: string): any[] {
   const alerts = []
   
   // Pressure thresholds (in bar)
