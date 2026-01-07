@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { MobileLayout } from '@/components/layout/MobileLayout';
 import { StateDisplay } from '@/components/shared/StateDisplay';
 import { 
-  AlertTriageCard, 
   OccurrenceCard,
   AlertDetailSheet,
   UserAssignmentModal
@@ -13,17 +12,19 @@ import { QuickStat } from '@/components/dashboard/QuickStats';
 import { 
   FiltersBottomSheet,
   ActiveFiltersChips,
-  ActivityFeed,
   LastUpdatedIndicator,
   ResolveAlertModal,
-  SlaIndicator,
-  getSlaStatus
+  getSlaStatus,
+  SwipeableAlertCard,
+  TeamPresence,
+  LiveActivityFeed,
+  CommandStats,
+  SlaCountdown
 } from '@/components/command-center';
 import type { ActivityItem } from '@/components/command-center';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { Input } from '@/components/ui/input';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
@@ -41,7 +42,8 @@ import {
   AlertCircle,
   Search,
   History,
-  Target
+  Target,
+  Users
 } from 'lucide-react';
 import { subHours, subDays, subMinutes, addHours } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -760,10 +762,10 @@ const CommandCenterPage = () => {
                         key={alert.id}
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -10 }}
+                        exit={{ opacity: 0, x: -100, scale: 0.9 }}
                         transition={{ delay: index * 0.02 }}
                       >
-                        <AlertTriageCard
+                        <SwipeableAlertCard
                           alert={{
                             id: alert.id,
                             type: alert.type,
@@ -777,12 +779,15 @@ const CommandCenterPage = () => {
                             machine: alert.machines,
                             tire: alert.tires,
                             assigned_to: alert.acknowledged_by,
+                            sla_due_at: alert.sla_due_at,
                           }}
                           onViewDetails={handleViewAlertDetails}
                           onAssign={handleOpenAssignment}
                           onAcknowledge={(id) => acknowledgeMutation.mutate(id)}
                           onResolve={handleOpenResolve}
-                          onCreateOccurrence={handleCreateOccurrence}
+                          onEscalate={(id) => {
+                            toast.info('Alerta escalado para supervisão');
+                          }}
                           loading={acknowledgeMutation.isPending || resolveMutation.isPending}
                         />
                       </motion.div>
@@ -852,22 +857,54 @@ const CommandCenterPage = () => {
             </Tabs>
           </div>
 
-          {/* Activity Feed */}
-          <div className="hidden lg:block">
-            <Card className="h-fit">
+          {/* Sidebar - Activity Feed & Team Presence */}
+          <div className="hidden lg:flex lg:flex-col gap-4">
+            {/* Team Presence */}
+            <Card>
               <CardHeader className="pb-3">
                 <CardTitle className="flex items-center gap-2 text-base">
-                  <History className="w-4 h-4" />
-                  Atividade Recente
+                  <Users className="w-4 h-4" />
+                  Equipe Online
                 </CardTitle>
               </CardHeader>
               <CardContent className="pt-0">
-                <ActivityFeed
-                  activities={activities}
-                  maxHeight="500px"
-                />
+                <TeamPresence maxVisible={5} />
               </CardContent>
             </Card>
+
+            {/* Live Activity Feed */}
+            <Card className="flex-1">
+              <CardHeader className="pb-3">
+                <CardTitle className="flex items-center gap-2 text-base">
+                  <History className="w-4 h-4" />
+                  Atividade em Tempo Real
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <LiveActivityFeed activities={activities} />
+              </CardContent>
+            </Card>
+
+            {/* SLA Countdown for most urgent */}
+            {sortedAlerts.length > 0 && sortedAlerts[0].sla_due_at && getSlaStatus(sortedAlerts[0].sla_due_at) !== 'ok' && (
+              <Card className="border-status-warning/50 bg-status-warning/5">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-sm">
+                    <Clock className="w-4 h-4 text-status-warning" />
+                    Próximo SLA Vencendo
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="pt-0">
+                  <p className="text-xs text-muted-foreground mb-2 line-clamp-1">
+                    {sortedAlerts[0].message}
+                  </p>
+                  <SlaCountdown
+                    dueAt={sortedAlerts[0].sla_due_at}
+                    onExpire={() => toast.error('SLA expirado!')}
+                  />
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </div>
