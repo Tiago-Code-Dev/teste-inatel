@@ -12,6 +12,7 @@ import {
 } from "@/components/inatel";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeTelemetry } from "@/hooks/useRealtimeTelemetry";
 
 export default function VehicleDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -29,33 +30,80 @@ export default function VehicleDetailPage() {
     enabled: !!id,
   });
 
+  // Fetch tires for this machine
+  const { data: tires } = useQuery({
+    queryKey: ['machine-tires', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tires')
+        .select('*')
+        .eq('machine_id', id);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Real-time telemetry data
+  const { latestReading, stats, isLoading: telemetryLoading } = useRealtimeTelemetry(id);
+
   // Generate tabs dynamically based on tire count
   const tabs = useMemo(() => {
     const baseTabs = [{ id: "geral", label: "Geral" }];
-    // Assuming 4 tires for now
-    for (let i = 1; i <= 4; i++) {
+    const tireCount = tires?.length || 4;
+    for (let i = 1; i <= tireCount; i++) {
       baseTabs.push({ id: `pneu${i}`, label: `Pneu ${i}` });
     }
     return baseTabs;
-  }, []);
+  }, [tires]);
 
-  // Mock tire data - in real app this would come from API
-  const tireData = [
-    { position: 1, status: "ok" as const, pressure: 32, label: "Dianteiro E" },
-    { position: 2, status: "ok" as const, pressure: 31, label: "Dianteiro D" },
-    { position: 3, status: "warning" as const, pressure: 28, label: "Traseiro E" },
-    { position: 4, status: "critical" as const, pressure: 18, label: "Traseiro D" },
-  ];
-
-  // Mock metrics
-  const mockMetrics = {
-    speed: 12,
-    hoursWorked: 231,
-    kmTraveled: 128,
-    engate: "Plantadeira",
-    avanco: 45,
-    patinagem: 22,
+  // Helper to determine tire status based on pressure
+  const getTireStatus = (pressure: number | null, recommended: number): "ok" | "warning" | "critical" | "offline" => {
+    if (pressure === null) return "offline";
+    const diff = Math.abs(pressure - recommended);
+    if (diff <= 2) return "ok";
+    if (diff <= 5) return "warning";
+    return "critical";
   };
+
+  // Map tires to grid data with real telemetry
+  const tireData = useMemo(() => {
+    if (!tires || tires.length === 0) {
+      // Fallback to default 4 tires if no tires found
+      return [
+        { position: 1, status: "offline" as const, pressure: 0, label: "Dianteiro E" },
+        { position: 2, status: "offline" as const, pressure: 0, label: "Dianteiro D" },
+        { position: 3, status: "offline" as const, pressure: 0, label: "Traseiro E" },
+        { position: 4, status: "offline" as const, pressure: 0, label: "Traseiro D" },
+      ];
+    }
+
+    const positionLabels: Record<string, string> = {
+      "front_left": "Dianteiro E",
+      "front_right": "Dianteiro D",
+      "rear_left": "Traseiro E",
+      "rear_right": "Traseiro D",
+    };
+
+    return tires.map((tire, index) => ({
+      position: index + 1,
+      status: getTireStatus(tire.current_pressure, tire.recommended_pressure),
+      pressure: tire.current_pressure || 0,
+      label: positionLabels[tire.position || ''] || `Posição ${index + 1}`,
+      tireId: tire.id,
+      recommendedPressure: tire.recommended_pressure,
+    }));
+  }, [tires]);
+
+  // Real metrics from telemetry
+  const metrics = useMemo(() => ({
+    speed: latestReading?.speed || 0,
+    hoursWorked: 231, // TODO: Calculate from telemetry history
+    kmTraveled: 128, // TODO: Calculate from telemetry history
+    engate: "Plantadeira",
+    avanco: stats?.avgSpeed ? Math.round((stats.avgSpeed / 40) * 100) : 0,
+    patinagem: 22, // TODO: Calculate from telemetry
+  }), [latestReading, stats]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -151,10 +199,10 @@ export default function VehicleDetailPage() {
               <Card>
                 <CardContent className="p-4">
                   <BigMetricDisplay
-                    value={mockMetrics.speed}
+                    value={metrics.speed}
                     unit="km/h"
                     label="Velocidade"
-                    status="ok"
+                    status={metrics.speed > 35 ? "warning" : "ok"}
                   />
                 </CardContent>
               </Card>
@@ -165,7 +213,7 @@ export default function VehicleDetailPage() {
                     <span className="text-sm text-muted-foreground">Engate</span>
                   </div>
                   <p className="text-lg font-bold text-foreground">
-                    {mockMetrics.engate}
+                    {metrics.engate}
                   </p>
                 </CardContent>
               </Card>
@@ -173,8 +221,8 @@ export default function VehicleDetailPage() {
 
             {/* Work Metrics */}
             <WorkMetricsCard
-              hoursWorked={mockMetrics.hoursWorked}
-              kmTraveled={mockMetrics.kmTraveled}
+              hoursWorked={metrics.hoursWorked}
+              kmTraveled={metrics.kmTraveled}
             />
 
             {/* Performance Indicators */}
@@ -184,11 +232,11 @@ export default function VehicleDetailPage() {
               </CardHeader>
               <CardContent className="space-y-6">
                 <StatusIndicatorBar
-                  value={mockMetrics.avanco}
+                  value={metrics.avanco}
                   label="Avanço"
                 />
                 <StatusIndicatorBar
-                  value={mockMetrics.patinagem}
+                  value={metrics.patinagem}
                   label="Patinagem"
                 />
               </CardContent>
