@@ -15,7 +15,8 @@ import {
   Droplets,
   MapPin,
   BarChart3,
-  DollarSign
+  DollarSign,
+  Car
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ const navigation = [
   { name: 'Geolocalização', href: '/geolocation', icon: MapPin },
   { name: 'Equilíbrio', href: '/balance', icon: BarChart3 },
   { name: 'Custos', href: '/costs', icon: DollarSign },
+  { name: 'Frota', href: '/fleet', icon: Car },
   { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: 7 },
   { name: 'Ocorrências', href: '/occurrences', icon: FileText, badge: 4 },
   { name: 'Pneus', href: '/tires', icon: CircleDot },
