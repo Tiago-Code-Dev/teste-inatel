@@ -4,6 +4,8 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
+import { AuthProvider } from "@/contexts/AuthContext";
+import { TenantProvider } from "@/contexts/TenantContext";
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 
 import AuthPage from "./pages/AuthPage";
@@ -34,41 +36,45 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/auth" element={<AuthPage />} />
+    <AuthProvider>
+      <TenantProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <Routes>
+              <Route path="/auth" element={<AuthPage />} />
 
-          <Route element={<ProtectedRoute />}>
-            <Route path="/" element={<Dashboard />} />
-            <Route path="/operations" element={<OperationalDashboardPage />} />
-            <Route path="/command-center" element={<CommandCenterPage />} />
-            <Route path="/team-operations" element={<OperationPage />} />
-            <Route path="/machines" element={<MachinesPage />} />
-            <Route path="/machines/:id" element={<MachineDetailPage />} />
-            <Route path="/alerts" element={<AlertsPage />} />
-            <Route path="/occurrences" element={<OccurrencesPage />} />
-            <Route path="/tires" element={<TiresPage />} />
-            <Route path="/tires/:id/history" element={<TireHistoryPage />} />
-            <Route path="/telemetry" element={<TelemetryAnalysisPage />} />
-            <Route path="/wear" element={<WearAnalysisPage />} />
-            <Route path="/fluid" element={<FluidBallastPage />} />
-            <Route path="/geolocation" element={<GeolocationPage />} />
-            <Route path="/balance" element={<BalanceDashboardPage />} />
-            <Route path="/costs" element={<CostManagementPage />} />
-            <Route path="/fleet" element={<FleetManagementPage />} />
-            <Route path="/calibration" element={<TireCalibrationPage />} />
-            <Route path="/deformation" element={<TireDeformationPage />} />
-            <Route path="/bi" element={<BusinessIntelligencePage />} />
-            <Route path="/load" element={<LoadAnalysisPage />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/operations" element={<OperationalDashboardPage />} />
+                <Route path="/command-center" element={<CommandCenterPage />} />
+                <Route path="/team-operations" element={<OperationPage />} />
+                <Route path="/machines" element={<MachinesPage />} />
+                <Route path="/machines/:id" element={<MachineDetailPage />} />
+                <Route path="/alerts" element={<AlertsPage />} />
+                <Route path="/occurrences" element={<OccurrencesPage />} />
+                <Route path="/tires" element={<TiresPage />} />
+                <Route path="/tires/:id/history" element={<TireHistoryPage />} />
+                <Route path="/telemetry" element={<TelemetryAnalysisPage />} />
+                <Route path="/wear" element={<WearAnalysisPage />} />
+                <Route path="/fluid" element={<FluidBallastPage />} />
+                <Route path="/geolocation" element={<GeolocationPage />} />
+                <Route path="/balance" element={<BalanceDashboardPage />} />
+                <Route path="/costs" element={<CostManagementPage />} />
+                <Route path="/fleet" element={<FleetManagementPage />} />
+                <Route path="/calibration" element={<TireCalibrationPage />} />
+                <Route path="/deformation" element={<TireDeformationPage />} />
+                <Route path="/bi" element={<BusinessIntelligencePage />} />
+                <Route path="/load" element={<LoadAnalysisPage />} />
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                <Route path="*" element={<NotFound />} />
+              </Route>
+            </Routes>
+          </BrowserRouter>
+        </TooltipProvider>
+      </TenantProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 

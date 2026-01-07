@@ -1,7 +1,8 @@
 import { useState, useMemo, useCallback } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { subHours, subDays, differenceInHours, differenceInMinutes } from 'date-fns';
+import { useTenant } from '@/contexts/TenantContext';
+import { subHours, subDays, differenceInHours } from 'date-fns';
 
 export interface KPIData {
   id: string;
@@ -63,6 +64,7 @@ const DEFAULT_FILTERS: DashboardFilters = {
 
 export const useOperationalDashboard = () => {
   const [filters, setFilters] = useState<DashboardFilters>(DEFAULT_FILTERS);
+  const { selectedUnitId } = useTenant();
 
   const getPeriodDate = useCallback((period: string): Date => {
     const now = new Date();
@@ -75,33 +77,43 @@ export const useOperationalDashboard = () => {
     }
   }, []);
 
-  // Fetch machines
+  // Fetch machines with unit filter
   const { data: machines = [], isLoading: machinesLoading, refetch: refetchMachines } = useQuery({
-    queryKey: ['machines-operational'],
+    queryKey: ['machines-operational', selectedUnitId],
     queryFn: async () => {
-      const { data, error } = await supabase
+      let query = supabase
         .from('machines')
         .select('*')
         .order('name');
+      
+      if (selectedUnitId) {
+        query = query.eq('unit_id', selectedUnitId);
+      }
+      
+      const { data, error } = await query;
       if (error) throw error;
       return data || [];
     },
   });
 
-  // Fetch alerts with period filter
+  // Fetch alerts with period filter and unit filter
   const { data: alerts = [], isLoading: alertsLoading, refetch: refetchAlerts } = useQuery({
-    queryKey: ['alerts-operational', filters.period],
+    queryKey: ['alerts-operational', filters.period, selectedUnitId],
     queryFn: async () => {
       const periodDate = getPeriodDate(filters.period);
       
       let query = supabase
         .from('alerts')
-        .select(`*, machines (name, model)`)
+        .select(`*, machines!inner (name, model, unit_id)`)
         .gte('opened_at', periodDate.toISOString())
         .order('opened_at', { ascending: false });
 
       if (!filters.showResolved) {
         query = query.neq('status', 'resolved');
+      }
+
+      if (selectedUnitId) {
+        query = query.eq('machines.unit_id', selectedUnitId);
       }
 
       const { data, error } = await query;
@@ -110,20 +122,24 @@ export const useOperationalDashboard = () => {
     },
   });
 
-  // Fetch telemetry for performance calculations
+  // Fetch telemetry for performance calculations with unit filter
   const { data: telemetry = [], isLoading: telemetryLoading } = useQuery({
-    queryKey: ['telemetry-operational', filters.period, filters.machineId],
+    queryKey: ['telemetry-operational', filters.period, filters.machineId, selectedUnitId],
     queryFn: async () => {
       const periodDate = getPeriodDate(filters.period);
       
       let query = supabase
         .from('telemetry')
-        .select('*')
+        .select(`*, machines!inner (id, unit_id)`)
         .gte('timestamp', periodDate.toISOString())
         .order('timestamp', { ascending: true });
 
       if (filters.machineId) {
         query = query.eq('machine_id', filters.machineId);
+      }
+
+      if (selectedUnitId) {
+        query = query.eq('machines.unit_id', selectedUnitId);
       }
 
       const { data, error } = await query.limit(1000);

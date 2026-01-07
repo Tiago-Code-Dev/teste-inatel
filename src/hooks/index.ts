@@ -5,3 +5,12 @@ export { useRealtimeAlerts } from './useRealtimeAlerts';
 export { useRealtimeMachines } from './useRealtimeMachines';
 export { useRealtimeOccurrences } from './useRealtimeOccurrences';
 export { apiClient, ingestTelemetry, fetchAlerts, performAlertAction, fetchMachineTimeline, fetchOccurrences, createOccurrence, updateOccurrence } from './useApiClient';
+
+// Multi-tenancy hooks
+export { 
+  useMachinesWithUnit, 
+  useAlertsWithUnit, 
+  useTelemetryWithUnit, 
+  useOccurrencesWithUnit,
+  useTiresWithUnit 
+} from './useUnitQueries';
