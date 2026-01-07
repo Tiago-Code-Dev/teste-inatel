@@ -402,9 +402,46 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      profiles_safe: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          email: string | null
+          id: string | null
+          name: string | null
+          unit_ids: string[] | null
+          user_id: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: never
+          id?: string | null
+          name?: string | null
+          unit_ids?: string[] | null
+          user_id?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          email?: never
+          id?: string | null
+          name?: string | null
+          unit_ids?: string[] | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      check_rate_limit: {
+        Args: { p_action: string; p_limit?: number; p_window_minutes?: number }
+        Returns: boolean
+      }
+      get_profile_for_display: {
+        Args: { profile_row: Database["public"]["Tables"]["profiles"]["Row"] }
+        Returns: Json
+      }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -412,6 +449,16 @@ export type Database = {
         }
         Returns: boolean
       }
+      log_security_event: {
+        Args: {
+          p_action: string
+          p_details?: Json
+          p_entity_id: string
+          p_entity_type: string
+        }
+        Returns: string
+      }
+      validate_telemetry_source: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "manager" | "technician" | "operator"
