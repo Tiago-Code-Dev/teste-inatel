@@ -167,7 +167,10 @@ Deno.serve(async (req) => {
 
       if (telemetryError) {
         console.error('Telemetry insert error:', telemetryError)
-        throw new Error(`Failed to insert telemetry: ${telemetryError.message}`)
+        return new Response(
+          JSON.stringify({ error: 'Failed to process telemetry data' }),
+          { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        )
       }
     }
 
