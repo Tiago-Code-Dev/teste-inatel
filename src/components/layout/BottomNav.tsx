@@ -1,10 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Truck, AlertTriangle, TrendingUp, Activity, MapPin } from 'lucide-react';
+import { Truck, AlertTriangle, Activity, MapPin, LayoutDashboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const navigation = [
-  { name: 'Operação', href: '/', icon: Truck },
+  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Operação', href: '/command-center', icon: Truck },
   { name: 'Telemetria', href: '/telemetry', icon: Activity },
   { name: 'Geo', href: '/geolocation', icon: MapPin },
   { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: true },
@@ -29,7 +30,7 @@ export function BottomNav({ alertCount = 0 }: BottomNavProps) {
               key={item.name}
               to={item.href}
               className={cn(
-                'flex flex-col items-center justify-center flex-1 gap-0.5 py-2 transition-colors relative',
+                'flex flex-col items-center justify-center flex-1 gap-0.5 py-2 transition-colors relative active:scale-95',
                 isActive 
                   ? 'text-primary' 
                   : 'text-muted-foreground hover:text-foreground'
@@ -38,11 +39,9 @@ export function BottomNav({ alertCount = 0 }: BottomNavProps) {
               <div className="relative">
                 <item.icon className="w-5 h-5" />
                 {item.badge && alertCount > 0 && (
-                  <Badge 
-                    className="absolute -top-1.5 -right-2 h-4 min-w-4 px-1 text-[10px] bg-status-critical text-white border-0"
-                  >
+                  <span className="absolute -top-1.5 -right-2 h-4 min-w-4 px-1 text-[10px] font-semibold bg-status-critical text-white border-0 rounded-full flex items-center justify-center">
                     {alertCount > 99 ? '99+' : alertCount}
-                  </Badge>
+                  </span>
                 )}
               </div>
               <span className="text-[10px] font-medium">{item.name}</span>
