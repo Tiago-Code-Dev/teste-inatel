@@ -2,23 +2,27 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { DashboardProvider, useDashboard } from '@/contexts/DashboardContext';
 import { DashboardErrorBoundary, DashboardError, DashboardEmptyState } from '@/components/dashboard/DashboardErrorBoundary';
 import { DashboardSkeleton } from '@/components/dashboard/DashboardSkeleton';
-import { MetricCard } from '@/components/dashboard/MetricCard';
+import { FleetHealthGauge } from '@/components/dashboard/FleetHealthGauge';
+import { AlertTicker } from '@/components/dashboard/AlertTicker';
+import { HeroSection, GlassPanel } from '@/components/dashboard/GlassComponents';
 import { StatusSummaryGrid } from '@/components/dashboard/StatusSummaryCard';
-import { MachineCard } from '@/components/dashboard/MachineCard';
+import { GlassMachineCard } from '@/components/dashboard/GlassMachineCard';
 import { AlertCard } from '@/components/dashboard/AlertCard';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Truck, 
   AlertTriangle, 
   FileText, 
-  XCircle,
   CheckCircle2,
   ChevronRight,
-  Heart,
-  RefreshCw
+  RefreshCw,
+  Zap,
+  Shield,
+  Activity
 } from 'lucide-react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { useMemo } from 'react';
 
 function DashboardContent() {
   const { 
@@ -33,22 +37,20 @@ function DashboardContent() {
   const navigate = useNavigate();
 
   // Sort machines by criticality
-  const sortedMachines = [...machines].sort((a, b) => {
+  const sortedMachines = useMemo(() => [...machines].sort((a, b) => {
     const priority: Record<string, number> = { critical: 0, warning: 1, operational: 2, offline: 3 };
     return (priority[a.status] ?? 4) - (priority[b.status] ?? 4);
-  });
+  }), [machines]);
 
   // Recent alerts (top 5)
-  const recentAlerts = alerts.slice(0, 5);
+  const recentAlerts = useMemo(() => alerts.slice(0, 5), [alerts]);
 
-  // Mock telemetry for demonstration (will be replaced with real data in Phase 2)
+  // Mock telemetry for demonstration
   const getMockTelemetry = (machineId: string) => {
-    const base = { pressure: 28, speed: 15 };
-    // Simulate variation based on machine id hash
     const hash = machineId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return { 
-      pressure: base.pressure + (hash % 5) - 2 + Math.random() * 2, 
-      speed: base.speed + (hash % 10) + Math.random() * 5 
+      pressure: 26 + (hash % 6) + Math.random() * 2, 
+      speed: 12 + (hash % 12) + Math.random() * 5 
     };
   };
 
@@ -94,39 +96,125 @@ function DashboardContent() {
       transition={{ duration: 0.3 }}
       className="space-y-6"
     >
-      {/* Hero Metrics */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricCard
-          title="Saúde da Frota"
-          value={`${stats.fleetHealthScore}%`}
-          subtitle={stats.fleetHealthScore >= 80 ? 'Excelente' : stats.fleetHealthScore >= 60 ? 'Atenção' : 'Crítico'}
-          icon={Heart}
-          variant={stats.fleetHealthScore >= 80 ? 'success' : stats.fleetHealthScore >= 60 ? 'warning' : 'danger'}
-          delay={0}
-        />
-        <MetricCard
-          title="Máquinas"
-          value={stats.totalMachines}
-          subtitle={`${stats.machinesOperational} operacionais`}
-          icon={Truck}
-          delay={0.05}
-        />
-        <MetricCard
-          title="Alertas Ativos"
-          value={stats.activeAlerts}
-          subtitle={stats.criticalAlerts > 0 ? `${stats.criticalAlerts} críticos` : 'Nenhum crítico'}
-          icon={AlertTriangle}
-          variant={stats.criticalAlerts > 0 ? 'danger' : stats.activeAlerts > 0 ? 'warning' : 'success'}
-          delay={0.1}
-        />
-        <MetricCard
-          title="Ocorrências"
-          value={stats.openOccurrences}
-          subtitle="Em aberto"
-          icon={FileText}
-          delay={0.15}
-        />
-      </div>
+      {/* Alert Ticker */}
+      <AlertTicker alerts={alerts} speed={5000} />
+
+      {/* Hero Section with Gauge */}
+      <HeroSection>
+        <div className="flex flex-col lg:flex-row items-center gap-8">
+          {/* Fleet Health Gauge */}
+          <div className="shrink-0">
+            <FleetHealthGauge 
+              score={stats.fleetHealthScore} 
+              previousScore={stats.fleetHealthScore + (Math.random() > 0.5 ? -5 : 3)}
+              size="lg"
+            />
+          </div>
+
+          {/* Quick Stats */}
+          <div className="flex-1 grid grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/20">
+                <Truck className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.totalMachines}</p>
+                <p className="text-xs text-muted-foreground">Máquinas</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.15 }}
+              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-status-ok/20">
+                <Activity className="w-5 h-5 text-status-ok" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-status-ok">{stats.machinesOperational}</p>
+                <p className="text-xs text-muted-foreground">Operacionais</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
+            >
+              <div className={`flex items-center justify-center w-10 h-10 rounded-lg ${
+                stats.criticalAlerts > 0 ? 'bg-status-critical/20' : 'bg-status-warning/20'
+              }`}>
+                <AlertTriangle className={`w-5 h-5 ${
+                  stats.criticalAlerts > 0 ? 'text-status-critical' : 'text-status-warning'
+                }`} />
+              </div>
+              <div>
+                <p className={`text-2xl font-bold ${
+                  stats.criticalAlerts > 0 ? 'text-status-critical' : 'text-foreground'
+                }`}>
+                  {stats.activeAlerts}
+                </p>
+                <p className="text-xs text-muted-foreground">Alertas Ativos</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary/20">
+                <FileText className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{stats.openOccurrences}</p>
+                <p className="text-xs text-muted-foreground">Ocorrências</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.3 }}
+              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-blue-500/20">
+                <Zap className="w-5 h-5 text-blue-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">{Math.round(stats.fleetHealthScore * 0.95)}%</p>
+                <p className="text-xs text-muted-foreground">Eficiência</p>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.35 }}
+              className="flex items-center gap-3 p-4 rounded-xl bg-white/5 backdrop-blur-sm border border-white/10"
+            >
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-emerald-500/20">
+                <Shield className="w-5 h-5 text-emerald-500" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold">
+                  {stats.machinesCritical === 0 ? '100%' : `${Math.round((1 - stats.machinesCritical / stats.totalMachines) * 100)}%`}
+                </p>
+                <p className="text-xs text-muted-foreground">Disponibilidade</p>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </HeroSection>
 
       {/* Status Summary */}
       <StatusSummaryGrid 
@@ -161,11 +249,11 @@ function DashboardContent() {
           <AnimatePresence mode="popLayout">
             <div className="grid sm:grid-cols-2 gap-4">
               {sortedMachines.slice(0, 6).map((machine, index) => (
-                <MachineCard
+                <GlassMachineCard
                   key={machine.id}
                   machine={machine}
                   telemetry={machine.status !== 'offline' ? getMockTelemetry(machine.id) : undefined}
-                  delay={0.2 + index * 0.05}
+                  delay={0.4 + index * 0.08}
                 />
               ))}
             </div>
@@ -192,12 +280,7 @@ function DashboardContent() {
             </Link>
           </div>
           
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25 }}
-            className="card-elevated divide-y divide-border overflow-hidden"
-          >
+          <GlassPanel className="divide-y divide-white/5">
             <AnimatePresence mode="popLayout">
               {recentAlerts.length > 0 ? (
                 recentAlerts.map((alert, index) => (
@@ -205,7 +288,7 @@ function DashboardContent() {
                     key={alert.id} 
                     alert={alert} 
                     compact 
-                    delay={0.3 + index * 0.05}
+                    delay={0.5 + index * 0.05}
                   />
                 ))
               ) : (
@@ -221,19 +304,19 @@ function DashboardContent() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </GlassPanel>
 
           {/* Refresh Button */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5 }}
+            transition={{ delay: 0.7 }}
             className="mt-4"
           >
             <Button 
               variant="outline" 
               size="sm" 
-              className="w-full gap-2"
+              className="w-full gap-2 bg-white/5 border-white/10 hover:bg-white/10"
               onClick={refetch}
             >
               <RefreshCw className="w-4 h-4" />
