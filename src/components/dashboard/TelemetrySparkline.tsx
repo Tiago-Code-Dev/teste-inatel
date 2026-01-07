@@ -1,5 +1,5 @@
-import { motion, useSpring, useTransform } from 'framer-motion';
-import { useEffect, useMemo, useRef } from 'react';
+import { motion } from 'framer-motion';
+import { useMemo, memo } from 'react';
 import { cn } from '@/lib/utils';
 
 interface TelemetrySparklineProps {
@@ -9,39 +9,46 @@ interface TelemetrySparklineProps {
   color?: 'primary' | 'success' | 'warning' | 'danger';
   showArea?: boolean;
   animate?: boolean;
+  showPulse?: boolean;
   className?: string;
 }
 
 const colorMap = {
   primary: {
     stroke: 'hsl(var(--primary))',
-    fill: 'hsl(var(--primary) / 0.1)',
+    fill: 'hsl(var(--primary) / 0.15)',
+    glow: 'hsl(var(--primary) / 0.3)',
   },
   success: {
     stroke: 'hsl(var(--status-ok))',
-    fill: 'hsl(var(--status-ok) / 0.1)',
+    fill: 'hsl(var(--status-ok) / 0.15)',
+    glow: 'hsl(var(--status-ok) / 0.3)',
   },
   warning: {
     stroke: 'hsl(var(--status-warning))',
-    fill: 'hsl(var(--status-warning) / 0.1)',
+    fill: 'hsl(var(--status-warning) / 0.15)',
+    glow: 'hsl(var(--status-warning) / 0.3)',
   },
   danger: {
     stroke: 'hsl(var(--status-critical))',
-    fill: 'hsl(var(--status-critical) / 0.1)',
+    fill: 'hsl(var(--status-critical) / 0.15)',
+    glow: 'hsl(var(--status-critical) / 0.3)',
   },
 };
 
-export function TelemetrySparkline({
+export const TelemetrySparkline = memo(function TelemetrySparkline({
   data,
   width = 80,
   height = 32,
   color = 'primary',
   showArea = true,
   animate = true,
+  showPulse = true,
   className,
 }: TelemetrySparklineProps) {
   const colors = colorMap[color];
   const padding = 2;
+  const uniqueId = useMemo(() => Math.random().toString(36).substr(2, 9), []);
   
   // Normalize data to fit in the SVG
   const normalizedData = useMemo(() => {
@@ -51,25 +58,32 @@ export function TelemetrySparkline({
     const range = max - min || 1;
     
     return data.map((value, index) => ({
-      x: padding + (index / (data.length - 1)) * (width - padding * 2),
+      x: padding + (index / Math.max(data.length - 1, 1)) * (width - padding * 2),
       y: height - padding - ((value - min) / range) * (height - padding * 2),
+      value,
     }));
   }, [data, width, height]);
 
-  // Create path string
+  // Create smooth curve path using Catmull-Rom spline
   const pathD = useMemo(() => {
     if (normalizedData.length < 2) return '';
     
-    // Smooth curve using quadratic bezier
-    let path = `M ${normalizedData[0].x} ${normalizedData[0].y}`;
+    const points = normalizedData;
+    let path = `M ${points[0].x} ${points[0].y}`;
     
-    for (let i = 1; i < normalizedData.length; i++) {
-      const prev = normalizedData[i - 1];
-      const curr = normalizedData[i];
-      const cpx = (prev.x + curr.x) / 2;
+    for (let i = 0; i < points.length - 1; i++) {
+      const p0 = points[Math.max(0, i - 1)];
+      const p1 = points[i];
+      const p2 = points[i + 1];
+      const p3 = points[Math.min(points.length - 1, i + 2)];
       
-      path += ` Q ${prev.x + (curr.x - prev.x) / 4} ${prev.y}, ${cpx} ${(prev.y + curr.y) / 2}`;
-      path += ` Q ${cpx + (curr.x - cpx) / 2} ${curr.y}, ${curr.x} ${curr.y}`;
+      // Catmull-Rom to Bezier conversion
+      const cp1x = p1.x + (p2.x - p0.x) / 6;
+      const cp1y = p1.y + (p2.y - p0.y) / 6;
+      const cp2x = p2.x - (p3.x - p1.x) / 6;
+      const cp2y = p2.y - (p3.y - p1.y) / 6;
+      
+      path += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
     }
     
     return path;
@@ -78,7 +92,9 @@ export function TelemetrySparkline({
   // Area path
   const areaPathD = useMemo(() => {
     if (!showArea || normalizedData.length < 2) return '';
-    return `${pathD} L ${normalizedData[normalizedData.length - 1].x} ${height - padding} L ${normalizedData[0].x} ${height - padding} Z`;
+    const lastPoint = normalizedData[normalizedData.length - 1];
+    const firstPoint = normalizedData[0];
+    return `${pathD} L ${lastPoint.x} ${height - padding} L ${firstPoint.x} ${height - padding} Z`;
   }, [pathD, normalizedData, height, showArea]);
 
   // Current value indicator
@@ -90,7 +106,16 @@ export function TelemetrySparkline({
         className={cn('flex items-center justify-center', className)}
         style={{ width, height }}
       >
-        <span className="text-xs text-muted-foreground">-</span>
+        <div className="flex gap-1">
+          {[0, 1, 2].map((i) => (
+            <motion.div
+              key={i}
+              className="w-1 h-1 rounded-full bg-muted-foreground/30"
+              animate={{ opacity: [0.3, 1, 0.3] }}
+              transition={{ duration: 1.5, repeat: Infinity, delay: i * 0.2 }}
+            />
+          ))}
+        </div>
       </div>
     );
   }
@@ -100,27 +125,38 @@ export function TelemetrySparkline({
       width={width} 
       height={height} 
       className={cn('overflow-visible', className)}
+      viewBox={`0 0 ${width} ${height}`}
+      preserveAspectRatio="none"
     >
-      {/* Gradient definition */}
+      {/* Gradient definitions */}
       <defs>
-        <linearGradient id={`sparkline-gradient-${color}`} x1="0" y1="0" x2="0" y2="1">
+        <linearGradient id={`sparkline-gradient-${uniqueId}`} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor={colors.fill} />
           <stop offset="100%" stopColor="transparent" />
         </linearGradient>
+        
+        {/* Glow filter */}
+        <filter id={`sparkline-glow-${uniqueId}`} x="-50%" y="-50%" width="200%" height="200%">
+          <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+          <feMerge>
+            <feMergeNode in="coloredBlur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
       </defs>
 
       {/* Area fill */}
       {showArea && (
         <motion.path
           d={areaPathD}
-          fill={`url(#sparkline-gradient-${color})`}
+          fill={`url(#sparkline-gradient-${uniqueId})`}
           initial={animate ? { opacity: 0 } : undefined}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
         />
       )}
 
-      {/* Line */}
+      {/* Line with glow */}
       <motion.path
         d={pathD}
         fill="none"
@@ -128,75 +164,122 @@ export function TelemetrySparkline({
         strokeWidth={2}
         strokeLinecap="round"
         strokeLinejoin="round"
+        filter={`url(#sparkline-glow-${uniqueId})`}
         initial={animate ? { pathLength: 0, opacity: 0 } : undefined}
         animate={{ pathLength: 1, opacity: 1 }}
-        transition={{ duration: 1, ease: 'easeOut' }}
+        transition={{ duration: 0.8, ease: 'easeOut' }}
       />
 
       {/* Current value dot */}
       {currentPoint && (
-        <motion.circle
-          cx={currentPoint.x}
-          cy={currentPoint.y}
-          r={3}
-          fill={colors.stroke}
-          initial={animate ? { scale: 0 } : undefined}
-          animate={{ scale: 1 }}
-          transition={{ delay: 0.8, type: 'spring', stiffness: 300 }}
-        />
-      )}
+        <>
+          {/* Outer glow */}
+          <motion.circle
+            cx={currentPoint.x}
+            cy={currentPoint.y}
+            r={4}
+            fill={colors.glow}
+            initial={animate ? { scale: 0 } : undefined}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.6, type: 'spring', stiffness: 300 }}
+          />
+          
+          {/* Inner dot */}
+          <motion.circle
+            cx={currentPoint.x}
+            cy={currentPoint.y}
+            r={2.5}
+            fill={colors.stroke}
+            initial={animate ? { scale: 0 } : undefined}
+            animate={{ scale: 1 }}
+            transition={{ delay: 0.7, type: 'spring', stiffness: 400 }}
+          />
 
-      {/* Pulsing effect on current dot */}
-      {currentPoint && (
-        <motion.circle
-          cx={currentPoint.x}
-          cy={currentPoint.y}
-          r={3}
-          fill="none"
-          stroke={colors.stroke}
-          strokeWidth={1}
-          initial={{ scale: 1, opacity: 0.8 }}
-          animate={{ scale: 2, opacity: 0 }}
-          transition={{ duration: 1.5, repeat: Infinity }}
-        />
+          {/* Pulsing ring */}
+          {showPulse && (
+            <motion.circle
+              cx={currentPoint.x}
+              cy={currentPoint.y}
+              r={2.5}
+              fill="none"
+              stroke={colors.stroke}
+              strokeWidth={1.5}
+              initial={{ scale: 1, opacity: 0.8 }}
+              animate={{ scale: 2.5, opacity: 0 }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+            />
+          )}
+        </>
       )}
     </svg>
   );
-}
+});
 
+// Live sparkline that connects to real telemetry
 interface LiveSparklineProps {
   machineId: string;
   metric: 'pressure' | 'speed';
+  data?: number[];
   color?: 'primary' | 'success' | 'warning' | 'danger';
+  width?: number;
+  height?: number;
   className?: string;
 }
 
-// Simulated live data hook (will be replaced with real telemetry)
-function useLiveTelemetry(machineId: string, metric: string) {
-  const dataRef = useRef<number[]>([]);
-  
-  // Generate initial data based on machine ID for consistency
-  useEffect(() => {
-    const hash = machineId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const baseValue = metric === 'pressure' ? 25 + (hash % 10) : 12 + (hash % 15);
+export const LiveSparkline = memo(function LiveSparkline({ 
+  machineId, 
+  metric, 
+  data,
+  color = 'primary', 
+  width = 80,
+  height = 32,
+  className,
+}: LiveSparklineProps) {
+  // Use provided data or generate placeholder
+  const displayData = useMemo(() => {
+    if (data && data.length > 0) return data;
     
-    // Initialize with 20 data points
-    dataRef.current = Array.from({ length: 20 }, (_, i) => 
-      baseValue + Math.sin(i / 3) * 3 + (Math.random() - 0.5) * 2
+    // Generate consistent placeholder based on machineId
+    const hash = machineId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const baseValue = metric === 'pressure' ? 25 + (hash % 8) : 12 + (hash % 15);
+    
+    return Array.from({ length: 20 }, (_, i) => 
+      baseValue + Math.sin((i + hash) / 4) * 2 + (Math.random() - 0.5) * 1.5
     );
-  }, [machineId, metric]);
-
-  return dataRef.current;
-}
-
-export function LiveSparkline({ machineId, metric, color = 'primary', className }: LiveSparklineProps) {
-  const data = useLiveTelemetry(machineId, metric);
+  }, [data, machineId, metric]);
   
   return (
     <TelemetrySparkline
-      data={data}
+      data={displayData}
       color={color}
+      width={width}
+      height={height}
       className={className}
+      showPulse={!!data && data.length > 0}
     />
+  );
+});
+
+// Connection status indicator
+interface ConnectionIndicatorProps {
+  isConnected: boolean;
+  className?: string;
+}
+
+export function ConnectionIndicator({ isConnected, className }: ConnectionIndicatorProps) {
+  return (
+    <div className={cn('flex items-center gap-1.5', className)}>
+      <motion.div
+        className={cn(
+          'w-2 h-2 rounded-full',
+          isConnected ? 'bg-status-ok' : 'bg-muted-foreground'
+        )}
+        animate={isConnected ? { scale: [1, 1.2, 1] } : undefined}
+        transition={{ duration: 2, repeat: Infinity }}
+      />
+      <span className="text-xs text-muted-foreground">
+        {isConnected ? 'Live' : 'Offline'}
+      </span>
+    </div>
   );
 }

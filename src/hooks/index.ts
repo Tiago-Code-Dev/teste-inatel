@@ -17,3 +17,6 @@ export {
 
 // Microinteraction hooks
 export { usePullToRefresh } from './usePullToRefresh';
+
+// Live telemetry hooks
+export { useLiveTelemetry, useMachineTelemetry } from './useLiveTelemetry';

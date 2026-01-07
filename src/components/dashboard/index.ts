@@ -19,7 +19,7 @@ export { AlertCard } from './AlertCard';
 
 // Phase 2: Visual Storytelling
 export { FleetHealthGauge } from './FleetHealthGauge';
-export { TelemetrySparkline, LiveSparkline } from './TelemetrySparkline';
+export { TelemetrySparkline, LiveSparkline, ConnectionIndicator } from './TelemetrySparkline';
 export { AlertTicker } from './AlertTicker';
 export { GlassMachineCard } from './GlassMachineCard';
 export { HeroSection, GlassCard, GlassPanel } from './GlassComponents';

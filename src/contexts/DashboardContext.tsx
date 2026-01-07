@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useTenant } from './TenantContext';
 import { useRealtimeAlerts } from '@/hooks/useRealtimeAlerts';
 import { useRealtimeMachines } from '@/hooks/useRealtimeMachines';
+import { useLiveTelemetry } from '@/hooks/useLiveTelemetry';
 
 export interface DashboardMachine {
   id: string;
@@ -39,16 +40,31 @@ export interface DashboardStats {
   fleetHealthScore: number;
 }
 
+export interface MachineTelemetryData {
+  machineId: string;
+  pressure: number[];
+  speed: number[];
+  latestPressure: number;
+  latestSpeed: number;
+  lastUpdated: Date;
+}
+
 interface DashboardContextType {
   // Data
   machines: DashboardMachine[];
   alerts: DashboardAlert[];
   stats: DashboardStats;
   
+  // Telemetry
+  telemetryByMachine: Map<string, MachineTelemetryData>;
+  getMachineTelemetry: (machineId: string) => MachineTelemetryData | undefined;
+  isTelemetryConnected: boolean;
+  
   // Loading states
   isLoading: boolean;
   isMachinesLoading: boolean;
   isAlertsLoading: boolean;
+  isTelemetryLoading: boolean;
   
   // Error states
   machinesError: Error | null;
@@ -107,6 +123,21 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     refetchInterval: 60000, // 1 minute
   });
 
+  // Get machine IDs for telemetry subscription
+  const machineIds = useMemo(() => machines.map(m => m.id), [machines]);
+
+  // Live telemetry for all machines
+  const {
+    telemetryByMachine,
+    getMachineTelemetry,
+    isLoading: isTelemetryLoading,
+    isConnected: isTelemetryConnected,
+  } = useLiveTelemetry({
+    machineIds,
+    maxDataPoints: 30,
+    enabled: machineIds.length > 0,
+  });
+
   // Fetch alerts
   const {
     data: alerts = [],
@@ -159,7 +190,7 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
     staleTime: 60000,
   });
 
-  // Calculate stats
+  // Calculate stats with telemetry health bonus
   const stats = useMemo((): DashboardStats => {
     const totalMachines = machines.length;
     const machinesOperational = machines.filter(m => m.status === 'operational').length;
@@ -182,7 +213,11 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
 
     // Penalty for critical alerts
     const alertPenalty = Math.min(criticalAlerts * 5, 30);
-    const fleetHealthScore = Math.max(0, Math.round(weightedScore - alertPenalty));
+    
+    // Bonus for live telemetry connection
+    const telemetryBonus = isTelemetryConnected ? 2 : 0;
+    
+    const fleetHealthScore = Math.max(0, Math.min(100, Math.round(weightedScore - alertPenalty + telemetryBonus)));
 
     return {
       totalMachines,
@@ -195,12 +230,13 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
       openOccurrences: occurrencesCount,
       fleetHealthScore,
     };
-  }, [machines, alerts, occurrencesCount]);
+  }, [machines, alerts, occurrencesCount, isTelemetryConnected]);
 
   const refetch = () => {
     refetchMachines();
     refetchAlerts();
     queryClient.invalidateQueries({ queryKey: ['occurrences-count'] });
+    queryClient.invalidateQueries({ queryKey: ['telemetry-sparklines'] });
   };
 
   const isLoading = isMachinesLoading || isAlertsLoading;
@@ -211,9 +247,13 @@ export function DashboardProvider({ children }: { children: ReactNode }) {
         machines,
         alerts,
         stats,
+        telemetryByMachine,
+        getMachineTelemetry,
+        isTelemetryConnected,
         isLoading,
         isMachinesLoading,
         isAlertsLoading,
+        isTelemetryLoading,
         machinesError: machinesError as Error | null,
         alertsError: alertsError as Error | null,
         refetch,
