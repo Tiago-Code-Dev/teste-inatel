@@ -1,13 +1,13 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Truck, AlertTriangle, Activity, MapPin, LayoutDashboard } from 'lucide-react';
+import { Truck, AlertTriangle, Activity, Smartphone, LayoutDashboard } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Dispositivos', href: '/devices', icon: Smartphone },
   { name: 'Operação', href: '/command-center', icon: Truck },
   { name: 'Telemetria', href: '/telemetry', icon: Activity },
-  { name: 'Geo', href: '/geolocation', icon: MapPin },
   { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: true },
 ];
 

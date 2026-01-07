@@ -20,7 +20,8 @@ import {
   Target,
   Disc,
   PieChart,
-  Weight
+  Weight,
+  Smartphone
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,7 @@ import { currentUser, dashboardStats } from '@/data/mockData';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+  { name: 'Dispositivos', href: '/devices', icon: Smartphone },
   { name: 'Centro de Operações', href: '/command-center', icon: Command, badge: 3 },
   { name: 'Gestão de Equipe', href: '/team-operations', icon: Users },
   { name: 'Máquinas', href: '/machines', icon: Truck },
