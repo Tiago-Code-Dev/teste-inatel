@@ -13,7 +13,8 @@ import {
   TrendingUp,
   Users,
   Droplets,
-  MapPin
+  MapPin,
+  BarChart3
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -29,6 +30,7 @@ const navigation = [
   { name: 'Desgaste', href: '/wear', icon: TrendingUp },
   { name: 'Lastro Líquido', href: '/fluid', icon: Droplets },
   { name: 'Geolocalização', href: '/geolocation', icon: MapPin },
+  { name: 'Equilíbrio', href: '/balance', icon: BarChart3 },
   { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: 7 },
   { name: 'Ocorrências', href: '/occurrences', icon: FileText, badge: 4 },
   { name: 'Pneus', href: '/tires', icon: CircleDot },
