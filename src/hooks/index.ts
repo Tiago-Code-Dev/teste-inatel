@@ -14,3 +14,6 @@ export {
   useOccurrencesWithUnit,
   useTiresWithUnit 
 } from './useUnitQueries';
+
+// Microinteraction hooks
+export { usePullToRefresh } from './usePullToRefresh';

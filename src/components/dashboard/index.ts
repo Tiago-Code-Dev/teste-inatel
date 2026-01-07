@@ -23,3 +23,10 @@ export { TelemetrySparkline, LiveSparkline } from './TelemetrySparkline';
 export { AlertTicker } from './AlertTicker';
 export { GlassMachineCard } from './GlassMachineCard';
 export { HeroSection, GlassCard, GlassPanel } from './GlassComponents';
+
+// Phase 3: Microinteractions
+export { DashboardShimmer, ShimmerSkeleton, MachineCardShimmer, AlertCardShimmer, HeroShimmer } from './ShimmerSkeleton';
+export { SwipeableCard, useHapticFeedback } from './SwipeableCard';
+export { StaggeredList, StaggeredItem, StaggeredCards } from './StaggeredList';
+export { HapticButton, HapticFAB, HapticCard } from './HapticButton';
+export { PullToRefreshIndicator } from './PullToRefreshIndicator';
