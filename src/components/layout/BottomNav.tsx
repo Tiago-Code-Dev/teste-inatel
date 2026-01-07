@@ -1,12 +1,12 @@
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Truck, AlertTriangle, TrendingUp, User, Activity } from 'lucide-react';
+import { Truck, AlertTriangle, TrendingUp, Activity, MapPin } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 
 const navigation = [
   { name: 'Operação', href: '/', icon: Truck },
   { name: 'Telemetria', href: '/telemetry', icon: Activity },
-  { name: 'Desgaste', href: '/wear', icon: TrendingUp },
+  { name: 'Geo', href: '/geolocation', icon: MapPin },
   { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: true },
 ];
 
