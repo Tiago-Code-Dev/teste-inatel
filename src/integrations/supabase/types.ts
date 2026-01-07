@@ -435,6 +435,7 @@ export type Database = {
     }
     Functions: {
       can_create_alert: { Args: never; Returns: boolean }
+      can_create_audit_event: { Args: never; Returns: boolean }
       check_rate_limit: {
         Args: { p_action: string; p_limit?: number; p_window_minutes?: number }
         Returns: boolean
