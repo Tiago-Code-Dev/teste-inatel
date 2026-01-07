@@ -20,3 +20,6 @@ export { usePullToRefresh } from './usePullToRefresh';
 
 // Live telemetry hooks
 export { useLiveTelemetry, useMachineTelemetry } from './useLiveTelemetry';
+
+// AI Insights hooks
+export { useAIInsights } from './useAIInsights';

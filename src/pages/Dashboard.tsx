@@ -11,6 +11,8 @@ import { AlertCard } from '@/components/dashboard/AlertCard';
 import { PullToRefreshIndicator } from '@/components/dashboard/PullToRefreshIndicator';
 import { StaggeredList, StaggeredItem } from '@/components/dashboard/StaggeredList';
 import { HapticButton } from '@/components/dashboard/HapticButton';
+import { IntelligenceLayer } from '@/components/dashboard/IntelligenceLayer';
+import { ConnectionIndicator } from '@/components/dashboard/TelemetrySparkline';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
@@ -32,6 +34,8 @@ function DashboardContent() {
     machines, 
     alerts, 
     stats, 
+    telemetryByMachine,
+    isTelemetryConnected,
     isLoading, 
     machinesError, 
     alertsError,
@@ -63,7 +67,7 @@ function DashboardContent() {
   // Recent alerts (top 5)
   const recentAlerts = useMemo(() => alerts.slice(0, 5), [alerts]);
 
-  // Mock telemetry for demonstration
+  // Mock telemetry for demonstration (fallback when no real data)
   const getMockTelemetry = (machineId: string) => {
     const hash = machineId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
     return { 
@@ -127,8 +131,12 @@ function DashboardContent() {
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1, duration: 0.4 }}
+        className="flex items-center gap-4"
       >
-        <AlertTicker alerts={alerts} speed={5000} />
+        <div className="flex-1">
+          <AlertTicker alerts={alerts} speed={5000} />
+        </div>
+        <ConnectionIndicator isConnected={isTelemetryConnected} />
       </motion.div>
 
       {/* Hero Section with Gauge */}
@@ -201,6 +209,19 @@ function DashboardContent() {
             </StaggeredList>
           </div>
         </HeroSection>
+      </motion.div>
+
+      {/* Intelligence Layer - AI Insights */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.4, duration: 0.5 }}
+      >
+        <IntelligenceLayer
+          stats={stats}
+          machines={machines}
+          telemetryByMachine={telemetryByMachine}
+        />
       </motion.div>
 
       {/* Status Summary */}
