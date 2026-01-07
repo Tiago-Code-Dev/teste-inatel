@@ -40,11 +40,11 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <TenantProvider>
-        <GlobalProviders>
-          <TooltipProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <GlobalProviders>
               <Routes>
                 <Route path="/auth" element={<AuthPage />} />
 
@@ -75,9 +75,9 @@ const App = () => (
                   <Route path="*" element={<NotFound />} />
                 </Route>
               </Routes>
-            </BrowserRouter>
-          </TooltipProvider>
-        </GlobalProviders>
+            </GlobalProviders>
+          </BrowserRouter>
+        </TooltipProvider>
       </TenantProvider>
     </AuthProvider>
   </QueryClientProvider>
