@@ -1,10 +1,10 @@
 import { forwardRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
-import { DashboardMachine } from '@/contexts/DashboardContext';
+import { DashboardMachine, useDashboard } from '@/contexts/DashboardContext';
 import { StatusBadge } from '@/components/shared/StatusBadge';
-import { TelemetrySparkline } from './TelemetrySparkline';
+import { TelemetrySparkline, ConnectionIndicator } from './TelemetrySparkline';
 import { cn } from '@/lib/utils';
-import { Truck, Clock, Gauge, Activity, ChevronRight } from 'lucide-react';
+import { Truck, Clock, Gauge, Activity, ChevronRight, Wifi } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -18,23 +18,15 @@ interface GlassMachineCardProps {
   delay?: number;
 }
 
-// Generate mock sparkline data based on machine ID for consistency
-function generateSparklineData(machineId: string, baseValue: number, variance: number): number[] {
-  const hash = machineId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const seed = hash % 100;
-  
-  return Array.from({ length: 20 }, (_, i) => {
-    const wave = Math.sin((i + seed) / 3) * variance;
-    const noise = (Math.sin((i + seed) * 7.3) * 0.5 + 0.5) * variance * 0.5;
-    return baseValue + wave + noise;
-  });
-}
-
 export const GlassMachineCard = forwardRef<HTMLAnchorElement, GlassMachineCardProps>(({ 
   machine, 
-  telemetry,
+  telemetry: propTelemetry,
   delay = 0,
 }, ref) => {
+  // Get real telemetry data from context
+  const { getMachineTelemetry, isTelemetryConnected } = useDashboard();
+  const liveTelemetry = getMachineTelemetry(machine.id);
+
   const timeAgo = machine.last_telemetry_at 
     ? formatDistanceToNow(new Date(machine.last_telemetry_at), {
         addSuffix: true,
@@ -44,16 +36,14 @@ export const GlassMachineCard = forwardRef<HTMLAnchorElement, GlassMachineCardPr
 
   const status = machine.status as 'operational' | 'warning' | 'critical' | 'offline';
   
-  // Generate consistent sparkline data
-  const pressureData = useMemo(() => 
-    generateSparklineData(machine.id, telemetry?.pressure || 28, 3),
-    [machine.id, telemetry?.pressure]
-  );
+  // Use real telemetry data or fallback to props
+  const currentPressure = liveTelemetry?.latestPressure ?? propTelemetry?.pressure;
+  const currentSpeed = liveTelemetry?.latestSpeed ?? propTelemetry?.speed;
+  const pressureData = liveTelemetry?.pressure ?? [];
+  const speedData = liveTelemetry?.speed ?? [];
   
-  const speedData = useMemo(() => 
-    generateSparklineData(machine.id + 'speed', telemetry?.speed || 15, 5),
-    [machine.id, telemetry?.speed]
-  );
+  // Has real live data
+  const hasLiveData = liveTelemetry && liveTelemetry.pressure.length > 0;
 
   const getSparklineColor = (status: string): 'success' | 'warning' | 'danger' | 'primary' => {
     switch (status) {
@@ -146,12 +136,29 @@ export const GlassMachineCard = forwardRef<HTMLAnchorElement, GlassMachineCardPr
                 <p className="text-sm text-muted-foreground">{machine.model}</p>
               </div>
             </div>
-            <StatusBadge 
-              status={status} 
-              showLabel={false} 
-              size="sm" 
-              pulse={status === 'critical'}
-            />
+            <div className="flex items-center gap-2">
+              {/* Live indicator */}
+              {hasLiveData && isTelemetryConnected && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-status-ok/10"
+                >
+                  <motion.div
+                    className="w-1.5 h-1.5 rounded-full bg-status-ok"
+                    animate={{ opacity: [1, 0.5, 1] }}
+                    transition={{ duration: 1.5, repeat: Infinity }}
+                  />
+                  <span className="text-[10px] font-medium text-status-ok">LIVE</span>
+                </motion.div>
+              )}
+              <StatusBadge 
+                status={status} 
+                showLabel={false} 
+                size="sm" 
+                pulse={status === 'critical'}
+              />
+            </div>
           </div>
 
           {/* Metrics with Sparklines */}
@@ -164,7 +171,7 @@ export const GlassMachineCard = forwardRef<HTMLAnchorElement, GlassMachineCardPr
                     <span className="text-xs text-muted-foreground">Pressão</span>
                   </div>
                   <span className="text-sm font-semibold tabular-nums">
-                    {telemetry?.pressure.toFixed(1) || '--'} PSI
+                    {currentPressure?.toFixed(1) || '--'} PSI
                   </span>
                 </div>
                 <TelemetrySparkline
@@ -173,6 +180,7 @@ export const GlassMachineCard = forwardRef<HTMLAnchorElement, GlassMachineCardPr
                   height={24}
                   width={120}
                   className="w-full"
+                  showPulse={hasLiveData}
                 />
               </div>
               <div className="relative flex flex-col gap-1 px-3 py-2 rounded-xl bg-white/5 backdrop-blur-sm border border-white/5">
@@ -182,7 +190,7 @@ export const GlassMachineCard = forwardRef<HTMLAnchorElement, GlassMachineCardPr
                     <span className="text-xs text-muted-foreground">Velocidade</span>
                   </div>
                   <span className="text-sm font-semibold tabular-nums">
-                    {telemetry?.speed.toFixed(0) || '--'} km/h
+                    {currentSpeed?.toFixed(0) || '--'} km/h
                   </span>
                 </div>
                 <TelemetrySparkline
@@ -191,6 +199,7 @@ export const GlassMachineCard = forwardRef<HTMLAnchorElement, GlassMachineCardPr
                   height={24}
                   width={120}
                   className="w-full"
+                  showPulse={hasLiveData}
                 />
               </div>
             </div>
