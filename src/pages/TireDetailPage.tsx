@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Settings, Clock, Gauge, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,9 @@ import {
 } from "@/components/inatel";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useRealtimeTelemetry } from "@/hooks/useRealtimeTelemetry";
 
 export default function TireDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,34 +27,118 @@ export default function TireDetailPage() {
     { id: "alerts", label: "Alertas" },
   ];
 
-  // Mock tire data
-  const tireData = {
-    id,
-    model: "Firestone 18.4R38",
-    position: 3,
-    positionLabel: "Traseiro Esquerdo",
-    currentPressure: 28,
-    recommendedPressure: 32,
-    status: "warning" as const,
-    lifeHours: 1234,
-    kmTraveled: 8567,
-    installedAt: new Date("2024-06-15"),
-    lastUpdate: new Date(),
+  // Fetch tire data from database
+  const { data: tire, isLoading: tireLoading } = useQuery({
+    queryKey: ['tire-detail', id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tires')
+        .select('*, machines(*)')
+        .eq('id', id)
+        .single();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!id,
+  });
+
+  // Fetch all tires for the same machine
+  const { data: machineTires } = useQuery({
+    queryKey: ['machine-tires-for-tire', tire?.machine_id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('tires')
+        .select('*')
+        .eq('machine_id', tire!.machine_id);
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!tire?.machine_id,
+  });
+
+  // Real-time telemetry for the machine this tire belongs to
+  const { telemetryData, latestReading, isLoading: telemetryLoading } = useRealtimeTelemetry(tire?.machine_id);
+
+  // Helper to determine tire status based on pressure
+  const getTireStatus = (pressure: number | null, recommended: number): "ok" | "warning" | "critical" | "offline" => {
+    if (pressure === null) return "offline";
+    const diff = Math.abs(pressure - recommended);
+    if (diff <= 2) return "ok";
+    if (diff <= 5) return "warning";
+    return "critical";
   };
 
-  // Mock pressure history
-  const pressureHistory = Array.from({ length: 24 }, (_, i) => ({
-    time: `${String(i).padStart(2, "0")}:00`,
-    pressure: 28 + Math.random() * 6 - 3,
-  }));
+  // Position labels mapping
+  const positionLabels: Record<string, string> = {
+    "front_left": "Dianteiro Esquerdo",
+    "front_right": "Dianteiro Direito",
+    "rear_left": "Traseiro Esquerdo",
+    "rear_right": "Traseiro Direito",
+  };
 
-  // Mock tire grid (showing current tire highlighted)
-  const allTires = [
-    { position: 1, status: "ok" as const, pressure: 32 },
-    { position: 2, status: "ok" as const, pressure: 31 },
-    { position: 3, status: "warning" as const, pressure: 28 },
-    { position: 4, status: "critical" as const, pressure: 18 },
-  ];
+  // Derived tire data with real values
+  const tireData = useMemo(() => {
+    if (!tire) return null;
+    
+    const currentPressure = tire.current_pressure ?? latestReading?.pressure ?? 0;
+    const status = getTireStatus(currentPressure, tire.recommended_pressure);
+    
+    return {
+      id: tire.id,
+      model: tire.serial || "Pneu",
+      position: machineTires?.findIndex(t => t.id === tire.id) ?? 0 + 1,
+      positionLabel: positionLabels[tire.position || ''] || tire.position || "Não definido",
+      currentPressure,
+      recommendedPressure: tire.recommended_pressure,
+      status,
+      lifeHours: 1234, // TODO: Calculate from telemetry history
+      kmTraveled: 8567, // TODO: Calculate from telemetry history
+      installedAt: tire.installed_at ? new Date(tire.installed_at) : new Date(tire.created_at),
+      lastUpdate: tire.updated_at ? new Date(tire.updated_at) : new Date(),
+    };
+  }, [tire, machineTires, latestReading]);
+
+  // Generate pressure history from real telemetry data
+  const pressureHistory = useMemo(() => {
+    if (!telemetryData || telemetryData.length === 0) {
+      // Generate mock data if no real data available
+      return Array.from({ length: 24 }, (_, i) => ({
+        time: `${String(i).padStart(2, "0")}:00`,
+        pressure: (tireData?.currentPressure || 28) + Math.random() * 6 - 3,
+      }));
+    }
+
+    // Group telemetry by hour and get average pressure
+    const hourlyData: Record<string, number[]> = {};
+    telemetryData.forEach(reading => {
+      const hour = format(new Date(reading.timestamp), "HH:00");
+      if (!hourlyData[hour]) hourlyData[hour] = [];
+      hourlyData[hour].push(reading.pressure);
+    });
+
+    return Object.entries(hourlyData).map(([time, pressures]) => ({
+      time,
+      pressure: pressures.reduce((a, b) => a + b, 0) / pressures.length,
+    })).sort((a, b) => a.time.localeCompare(b.time));
+  }, [telemetryData, tireData?.currentPressure]);
+
+  // Map all tires to grid format
+  const allTires = useMemo(() => {
+    if (!machineTires || machineTires.length === 0) {
+      return [
+        { position: 1, status: "offline" as const, pressure: 0 },
+        { position: 2, status: "offline" as const, pressure: 0 },
+        { position: 3, status: "offline" as const, pressure: 0 },
+        { position: 4, status: "offline" as const, pressure: 0 },
+      ];
+    }
+
+    return machineTires.map((t, index) => ({
+      position: index + 1,
+      status: getTireStatus(t.current_pressure, t.recommended_pressure),
+      pressure: t.current_pressure || 0,
+    }));
+  }, [machineTires]);
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -82,12 +169,34 @@ export default function TireDetailPage() {
     }
   };
 
-  const getPressureStatus = () => {
+  const getPressureStatus = (): "ok" | "warning" | "critical" | "neutral" => {
+    if (!tireData) return "neutral";
     const diff = tireData.currentPressure - tireData.recommendedPressure;
     if (Math.abs(diff) <= 2) return "ok";
     if (Math.abs(diff) <= 5) return "warning";
     return "critical";
   };
+
+  // Loading state
+  if (tireLoading) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-4">
+        <p className="text-muted-foreground">Carregando dados do pneu...</p>
+      </div>
+    );
+  }
+
+  // Not found state
+  if (!tire || !tireData) {
+    return (
+      <div className="flex flex-col items-center justify-center h-full p-4">
+        <p className="text-muted-foreground">Pneu não encontrado</p>
+        <Button variant="link" onClick={() => navigate("/devices")}>
+          Voltar para lista
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col h-full bg-background">
@@ -128,12 +237,20 @@ export default function TireDetailPage() {
             {/* Tire Position Grid */}
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Posição no Veículo</CardTitle>
+                <CardTitle className="text-base">
+                  Posição no Veículo
+                  {tire.machines && (
+                    <span className="text-sm font-normal text-muted-foreground ml-2">
+                      ({tire.machines.name})
+                    </span>
+                  )}
+                </CardTitle>
               </CardHeader>
               <CardContent>
                 <TirePositionGrid
                   tires={allTires}
                   selectedPosition={tireData.position}
+                  showVehicle
                 />
               </CardContent>
             </Card>
