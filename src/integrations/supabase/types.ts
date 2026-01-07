@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      alert_comments: {
+        Row: {
+          alert_id: string
+          attachment_type: string | null
+          attachment_url: string | null
+          author_id: string
+          content: string
+          created_at: string
+          id: string
+          mentions: string[] | null
+          updated_at: string
+        }
+        Insert: {
+          alert_id: string
+          attachment_type?: string | null
+          attachment_url?: string | null
+          author_id: string
+          content: string
+          created_at?: string
+          id?: string
+          mentions?: string[] | null
+          updated_at?: string
+        }
+        Update: {
+          alert_id?: string
+          attachment_type?: string | null
+          attachment_url?: string | null
+          author_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          mentions?: string[] | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "alert_comments_alert_id_fkey"
+            columns: ["alert_id"]
+            isOneToOne: false
+            referencedRelation: "alerts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       alerts: {
         Row: {
           acknowledged_by: string | null
@@ -77,6 +121,42 @@ export type Database = {
           },
         ]
       }
+      analytics_daily: {
+        Row: {
+          alerts_by_severity: Json | null
+          alerts_by_type: Json | null
+          avg_resolution_time_minutes: number | null
+          created_at: string
+          date: string
+          id: string
+          resolved_alerts: number | null
+          total_alerts: number | null
+          unit_id: string
+        }
+        Insert: {
+          alerts_by_severity?: Json | null
+          alerts_by_type?: Json | null
+          avg_resolution_time_minutes?: number | null
+          created_at?: string
+          date: string
+          id?: string
+          resolved_alerts?: number | null
+          total_alerts?: number | null
+          unit_id: string
+        }
+        Update: {
+          alerts_by_severity?: Json | null
+          alerts_by_type?: Json | null
+          avg_resolution_time_minutes?: number | null
+          created_at?: string
+          date?: string
+          id?: string
+          resolved_alerts?: number | null
+          total_alerts?: number | null
+          unit_id?: string
+        }
+        Relationships: []
+      }
       audit_events: {
         Row: {
           action: string
@@ -112,7 +192,10 @@ export type Database = {
           created_at: string
           id: string
           image_url: string | null
+          last_location_at: string | null
           last_telemetry_at: string | null
+          latitude: number | null
+          longitude: number | null
           model: string
           name: string
           status: string
@@ -123,7 +206,10 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          last_location_at?: string | null
           last_telemetry_at?: string | null
+          latitude?: number | null
+          longitude?: number | null
           model: string
           name: string
           status?: string
@@ -134,7 +220,10 @@ export type Database = {
           created_at?: string
           id?: string
           image_url?: string | null
+          last_location_at?: string | null
           last_telemetry_at?: string | null
+          latitude?: number | null
+          longitude?: number | null
           model?: string
           name?: string
           status?: string
