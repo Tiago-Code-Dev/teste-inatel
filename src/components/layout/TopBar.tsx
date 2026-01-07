@@ -1,8 +1,9 @@
-import { Bell, Menu, Search, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { Bell, Menu, Search, WifiOff, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
+import { UnitSelector } from './UnitSelector';
 
 interface TopBarProps {
   title?: string;
@@ -70,6 +71,9 @@ export function TopBar({ title, subtitle, showBackButton, onMenuClick }: TopBarP
           <p className="text-sm text-muted-foreground truncate">{subtitle}</p>
         )}
       </div>
+
+      {/* Unit Selector */}
+      <UnitSelector />
 
       {/* Search */}
       <div className="hidden md:flex relative max-w-sm">

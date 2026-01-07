@@ -382,6 +382,33 @@ export type Database = {
           },
         ]
       }
+      units: {
+        Row: {
+          active: boolean
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           id: string
@@ -444,6 +471,7 @@ export type Database = {
         Args: { profile_row: Database["public"]["Tables"]["profiles"]["Row"] }
         Returns: Json
       }
+      get_user_unit_ids: { Args: { _user_id: string }; Returns: string[] }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -459,6 +487,10 @@ export type Database = {
           p_entity_type: string
         }
         Returns: string
+      }
+      user_has_unit_access: {
+        Args: { _unit_id: string; _user_id: string }
+        Returns: boolean
       }
     }
     Enums: {
