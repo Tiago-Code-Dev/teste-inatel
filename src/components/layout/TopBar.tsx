@@ -1,9 +1,9 @@
-import { Bell, Menu, Search, WifiOff, RefreshCw } from 'lucide-react';
+import { Menu, Search, WifiOff, RefreshCw, Command } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { useState, useEffect, useCallback } from 'react';
 import { cn } from '@/lib/utils';
 import { UnitSelector } from './UnitSelector';
+import { NotificationCenter, useGlobalContext } from '@/components/global';
 
 interface TopBarProps {
   title?: string;
@@ -16,7 +16,7 @@ export function TopBar({ title, subtitle, showBackButton, onMenuClick }: TopBarP
   const [isOnline, setIsOnline] = useState(navigator.onLine);
   const [lastSync, setLastSync] = useState(new Date());
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [alertCount] = useState(7); // Would come from context/API
+  const { setCommandPaletteOpen } = useGlobalContext();
 
   useEffect(() => {
     const handleOnline = () => setIsOnline(true);
@@ -75,14 +75,28 @@ export function TopBar({ title, subtitle, showBackButton, onMenuClick }: TopBarP
       {/* Unit Selector */}
       <UnitSelector />
 
-      {/* Search */}
-      <div className="hidden md:flex relative max-w-sm">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Buscar máquinas, pneus..."
-          className="pl-9 w-64 bg-muted/50 border-transparent focus:border-primary transition-colors"
-        />
-      </div>
+      {/* Command Palette Trigger */}
+      <Button
+        variant="outline"
+        className="hidden md:flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground h-9 px-3"
+        onClick={() => setCommandPaletteOpen(true)}
+      >
+        <Search className="w-4 h-4" />
+        <span className="hidden lg:inline">Buscar...</span>
+        <kbd className="hidden lg:inline-flex h-5 items-center gap-1 rounded border bg-muted px-1.5 font-mono text-[10px] font-medium text-muted-foreground">
+          <span className="text-xs">⌘</span>K
+        </kbd>
+      </Button>
+
+      {/* Mobile search button */}
+      <Button
+        variant="ghost"
+        size="icon"
+        className="md:hidden active:scale-95 transition-transform"
+        onClick={() => setCommandPaletteOpen(true)}
+      >
+        <Search className="w-5 h-5" />
+      </Button>
 
       {/* Sync status */}
       <button 
@@ -109,14 +123,7 @@ export function TopBar({ title, subtitle, showBackButton, onMenuClick }: TopBarP
       </button>
 
       {/* Notifications */}
-      <Button variant="ghost" size="icon" className="relative active:scale-95 transition-transform">
-        <Bell className="w-5 h-5" />
-        {alertCount > 0 && (
-          <span className="absolute -top-1 -right-1 w-5 h-5 p-0 flex items-center justify-center text-[10px] font-semibold bg-status-critical text-white border-2 border-background rounded-full">
-            {alertCount > 9 ? '9+' : alertCount}
-          </span>
-        )}
-      </Button>
+      <NotificationCenter />
     </header>
   );
 }
