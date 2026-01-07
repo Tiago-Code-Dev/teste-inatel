@@ -33,6 +33,10 @@ import TireDeformationPage from "./pages/TireDeformationPage";
 import BusinessIntelligencePage from "./pages/BusinessIntelligencePage";
 import LoadAnalysisPage from "./pages/LoadAnalysisPage";
 import AdvancedAnalyticsPage from "./pages/AdvancedAnalyticsPage";
+import DevicesPage from "./pages/DevicesPage";
+import VehicleDetailPage from "./pages/VehicleDetailPage";
+import TireDetailPage from "./pages/TireDetailPage";
+import PressureHistoryPage from "./pages/PressureHistoryPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -73,6 +77,10 @@ const App = () => (
                   <Route path="/bi" element={<BusinessIntelligencePage />} />
                   <Route path="/load" element={<LoadAnalysisPage />} />
                   <Route path="/analytics" element={<AdvancedAnalyticsPage />} />
+                  <Route path="/devices" element={<DevicesPage />} />
+                  <Route path="/devices/:id" element={<VehicleDetailPage />} />
+                  <Route path="/tires/:id" element={<TireDetailPage />} />
+                  <Route path="/pressure-history/:id" element={<PressureHistoryPage />} />
                   {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                   <Route path="*" element={<NotFound />} />
                 </Route>
