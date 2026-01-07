@@ -141,6 +141,7 @@ export default function VehicleDetailPage() {
                     setSelectedTirePosition(pos);
                     setActiveTab(`pneu${pos}`);
                   }}
+                  showVehicle
                 />
               </CardContent>
             </Card>
