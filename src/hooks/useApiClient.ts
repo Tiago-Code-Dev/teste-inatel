@@ -33,7 +33,7 @@ async function getAuthHeaders(): Promise<HeadersInit> {
   const { data: { session } } = await supabase.auth.getSession();
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
-    'apikey': 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im13dnRkeGR6dnh6bXN3cGtlb2tvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njc3MDczNDgsImV4cCI6MjA4MzI4MzM0OH0.6Ht9A2OTYoPpOWcsRf9LEdYoviRSdSoX1i1Uyzv69ig',
+    'apikey': import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
   };
   
   if (session?.access_token) {
