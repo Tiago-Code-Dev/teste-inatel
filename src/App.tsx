@@ -10,6 +10,7 @@ import AuthPage from "./pages/AuthPage";
 import Dashboard from "./pages/Dashboard";
 import OperationalDashboardPage from "./pages/OperationalDashboardPage";
 import CommandCenterPage from "./pages/CommandCenterPage";
+import OperationPage from "./pages/OperationPage";
 import MachinesPage from "./pages/MachinesPage";
 import MachineDetailPage from "./pages/MachineDetailPage";
 import AlertsPage from "./pages/AlertsPage";
@@ -36,6 +37,7 @@ const App = () => (
             <Route path="/" element={<Dashboard />} />
             <Route path="/operations" element={<OperationalDashboardPage />} />
             <Route path="/command-center" element={<CommandCenterPage />} />
+            <Route path="/team-operations" element={<OperationPage />} />
             <Route path="/machines" element={<MachinesPage />} />
             <Route path="/machines/:id" element={<MachineDetailPage />} />
             <Route path="/alerts" element={<AlertsPage />} />
