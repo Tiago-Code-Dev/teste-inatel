@@ -22,6 +22,7 @@ import WearAnalysisPage from "./pages/WearAnalysisPage";
 import FluidBallastPage from "./pages/FluidBallastPage";
 import GeolocationPage from "./pages/GeolocationPage";
 import BalanceDashboardPage from "./pages/BalanceDashboardPage";
+import CostManagementPage from "./pages/CostManagementPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -51,6 +52,7 @@ const App = () => (
             <Route path="/fluid" element={<FluidBallastPage />} />
             <Route path="/geolocation" element={<GeolocationPage />} />
             <Route path="/balance" element={<BalanceDashboardPage />} />
+            <Route path="/costs" element={<CostManagementPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Route>
