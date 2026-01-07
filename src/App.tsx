@@ -18,6 +18,7 @@ import TiresPage from "./pages/TiresPage";
 import TireHistoryPage from "./pages/TireHistoryPage";
 import TelemetryAnalysisPage from "./pages/TelemetryAnalysisPage";
 import WearAnalysisPage from "./pages/WearAnalysisPage";
+import FluidBallastPage from "./pages/FluidBallastPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,6 +44,7 @@ const App = () => (
             <Route path="/tires/:id/history" element={<TireHistoryPage />} />
             <Route path="/telemetry" element={<TelemetryAnalysisPage />} />
             <Route path="/wear" element={<WearAnalysisPage />} />
+            <Route path="/fluid" element={<FluidBallastPage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Route>
