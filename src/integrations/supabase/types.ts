@@ -460,7 +460,6 @@ export type Database = {
         }
         Returns: string
       }
-      validate_telemetry_source: { Args: never; Returns: boolean }
     }
     Enums: {
       app_role: "admin" | "manager" | "technician" | "operator"
