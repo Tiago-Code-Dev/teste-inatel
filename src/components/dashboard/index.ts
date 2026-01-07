@@ -30,3 +30,7 @@ export { SwipeableCard, useHapticFeedback } from './SwipeableCard';
 export { StaggeredList, StaggeredItem, StaggeredCards } from './StaggeredList';
 export { HapticButton, HapticFAB, HapticCard } from './HapticButton';
 export { PullToRefreshIndicator } from './PullToRefreshIndicator';
+
+// Phase 4: Intelligence Layer
+export { AIInsightsWidget, PredictionsCard, AnomaliesCard, RecommendationsCard } from './AIInsightsWidgets';
+export { IntelligenceLayer } from './IntelligenceLayer';
