@@ -26,6 +26,7 @@ import CostManagementPage from "./pages/CostManagementPage";
 import FleetManagementPage from "./pages/FleetManagementPage";
 import TireCalibrationPage from "./pages/TireCalibrationPage";
 import TireDeformationPage from "./pages/TireDeformationPage";
+import BusinessIntelligencePage from "./pages/BusinessIntelligencePage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -59,6 +60,7 @@ const App = () => (
             <Route path="/fleet" element={<FleetManagementPage />} />
             <Route path="/calibration" element={<TireCalibrationPage />} />
             <Route path="/deformation" element={<TireDeformationPage />} />
+            <Route path="/bi" element={<BusinessIntelligencePage />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Route>

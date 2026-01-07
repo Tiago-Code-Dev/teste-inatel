@@ -18,7 +18,8 @@ import {
   DollarSign,
   Car,
   Target,
-  Disc
+  Disc,
+  PieChart
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
@@ -39,6 +40,7 @@ const navigation = [
   { name: 'Frota', href: '/fleet', icon: Car },
   { name: 'Calibração', href: '/calibration', icon: Target },
   { name: 'Amassamento', href: '/deformation', icon: Disc },
+  { name: 'BI', href: '/bi', icon: PieChart },
   { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: 7 },
   { name: 'Ocorrências', href: '/occurrences', icon: FileText, badge: 4 },
   { name: 'Pneus', href: '/tires', icon: CircleDot },
