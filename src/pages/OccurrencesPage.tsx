@@ -15,8 +15,8 @@ import {
   Upload,
   CheckCircle2
 } from 'lucide-react';
-import { Link } from 'react-router-dom';
-import { format, formatDistanceToNow } from 'date-fns';
+import { Link, useNavigate } from 'react-router-dom';
+import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { cn } from '@/lib/utils';
 import { OccurrenceStatus, MediaType } from '@/types';
@@ -37,6 +37,8 @@ const mediaIcons: Record<MediaType, typeof Image> = {
 };
 
 const OccurrencesPage = () => {
+  const navigate = useNavigate();
+  
   const sortedOccurrences = [...occurrences].sort(
     (a, b) => b.createdAt.getTime() - a.createdAt.getTime()
   );
@@ -56,7 +58,7 @@ const OccurrencesPage = () => {
             <span className="text-sm font-medium text-primary">{openCount} Em aberto</span>
           </div>
         </div>
-        <Button className="gap-2">
+        <Button className="gap-2" onClick={() => navigate('/occurrences/new')}>
           <Plus className="w-4 h-4" />
           Nova Ocorrência
         </Button>
@@ -160,7 +162,7 @@ const OccurrencesPage = () => {
             <p className="text-sm text-muted-foreground mb-4">
               Registre uma nova ocorrência quando identificar um problema
             </p>
-            <Button className="gap-2">
+            <Button className="gap-2" onClick={() => navigate('/occurrences/new')}>
               <Plus className="w-4 h-4" />
               Nova Ocorrência
             </Button>
