@@ -15,6 +15,7 @@ import { ptBR } from "date-fns/locale";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeTelemetry } from "@/hooks/useRealtimeTelemetry";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 export default function TireDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -180,26 +181,31 @@ export default function TireDetailPage() {
   // Loading state
   if (tireLoading) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-4">
-        <p className="text-muted-foreground">Carregando dados do pneu...</p>
-      </div>
+      <MainLayout title="Carregando...">
+        <div className="flex flex-col items-center justify-center h-[60vh] p-4">
+          <p className="text-muted-foreground">Carregando dados do pneu...</p>
+        </div>
+      </MainLayout>
     );
   }
 
   // Not found state
   if (!tire || !tireData) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-4">
-        <p className="text-muted-foreground">Pneu não encontrado</p>
-        <Button variant="link" onClick={() => navigate("/devices")}>
-          Voltar para lista
-        </Button>
-      </div>
+      <MainLayout title="Pneu não encontrado">
+        <div className="flex flex-col items-center justify-center h-[60vh] p-4">
+          <p className="text-muted-foreground">Pneu não encontrado</p>
+          <Button variant="link" onClick={() => navigate("/devices")}>
+            Voltar para lista
+          </Button>
+        </div>
+      </MainLayout>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <MainLayout title={tireData.model} subtitle={`Posição: ${tireData.positionLabel}`}>
+      <div className="flex flex-col h-full">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background border-b">
         <div className="flex items-center gap-3 p-4">
@@ -366,6 +372,7 @@ export default function TireDetailPage() {
           </div>
         )}
       </main>
-    </div>
+      </div>
+    </MainLayout>
   );
 }
