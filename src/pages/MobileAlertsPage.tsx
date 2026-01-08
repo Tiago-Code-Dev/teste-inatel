@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { MobileLayout } from '@/components/layout/MobileLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { SeverityBadge } from '@/components/shared/StatusBadge';
 import { StateDisplay } from '@/components/shared/StateDisplay';
 import { Button } from '@/components/ui/button';
@@ -86,33 +86,32 @@ const MobileAlertsPage = () => {
 
   if (isLoading) {
     return (
-      <MobileLayout title="Alertas" alertCount={openCount}>
+      <MainLayout title="Alertas" subtitle="Carregando...">
         <StateDisplay state="loading" className="h-[60vh]" />
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
   if (error) {
     return (
-      <MobileLayout title="Alertas" alertCount={openCount}>
+      <MainLayout title="Alertas">
         <StateDisplay 
           state="error" 
           className="h-[60vh]"
           action={{ label: 'Tentar novamente', onClick: () => refetch() }}
         />
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
   return (
-    <MobileLayout 
+    <MainLayout 
       title="Alertas" 
       subtitle={`${openCount} alertas em aberto`}
-      alertCount={openCount}
     >
-      <div className="p-4 space-y-4">
+      <div className="space-y-4">
         {/* Filters */}
-        <div className="flex gap-2 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {[
             { key: 'all', label: 'Todos' },
             { key: 'open', label: 'Abertos' },
@@ -233,7 +232,7 @@ const MobileAlertsPage = () => {
           />
         )}
       </div>
-    </MobileLayout>
+    </MainLayout>
   );
 };
 

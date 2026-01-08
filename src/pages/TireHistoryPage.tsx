@@ -2,7 +2,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { MobileLayout } from '@/components/layout/MobileLayout';
 import { 
   TimelineContainer, 
   TimeRangeSelector, 
@@ -11,7 +10,6 @@ import {
   EventDetailSheet
 } from '@/components/timeline';
 import { useTireTimeline } from '@/hooks/useTireTimeline';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -41,7 +39,6 @@ const lifecycleLabels: Record<string, { label: string; className: string }> = {
 export default function TireHistoryPage() {
   const { id: tireId } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const isMobile = useIsMobile();
   const [selectedEvent, setSelectedEvent] = useState<TimelineEvent | null>(null);
   const [isEventDetailOpen, setIsEventDetailOpen] = useState(false);
 
@@ -90,15 +87,7 @@ export default function TireHistoryPage() {
   }, [navigate, tireId]);
 
   if (tireLoading) {
-    return isMobile ? (
-      <MobileLayout showBackButton title="Carregando...">
-        <div className="p-4 space-y-4">
-          <Skeleton className="h-32 w-full rounded-xl" />
-          <Skeleton className="h-12 w-full" />
-          <Skeleton className="h-64 w-full" />
-        </div>
-      </MobileLayout>
-    ) : (
+    return (
       <MainLayout title="Carregando...">
         <div className="space-y-6">
           <Skeleton className="h-32 w-full rounded-xl" />
@@ -109,18 +98,7 @@ export default function TireHistoryPage() {
   }
 
   if (tireError || !tire) {
-    return isMobile ? (
-      <MobileLayout showBackButton title="Erro">
-        <div className="p-4">
-          <StateDisplay
-            state="error"
-            title="Pneu não encontrado"
-            description="O pneu solicitado não existe ou você não tem permissão para acessá-lo."
-            action={{ label: 'Voltar', onClick: handleBack }}
-          />
-        </div>
-      </MobileLayout>
-    ) : (
+    return (
       <MainLayout title="Erro">
         <StateDisplay
           state="error"
@@ -240,44 +218,6 @@ export default function TireHistoryPage() {
       />
     </div>
   );
-
-  // Mobile Layout
-  if (isMobile) {
-    return (
-      <MobileLayout 
-        showBackButton 
-        title={`Histórico - ${tire.serial}`}
-      >
-        <div className="p-4 space-y-4 pb-24">
-          <TireInfoCard />
-          
-          <Card className="p-4">
-            <FiltersSection />
-          </Card>
-
-          <ActionsBar />
-
-          <TimelineContainer
-            events={filteredEvents}
-            isLoading={timelineLoading}
-            isEmpty={filteredEvents.length === 0}
-            isOffline={isOffline}
-            error={timelineError}
-            onRetry={refetch}
-            onEventClick={handleEventClick}
-            showDateSeparators
-          />
-        </div>
-
-        <EventDetailSheet
-          event={selectedEvent}
-          open={isEventDetailOpen}
-          onOpenChange={setIsEventDetailOpen}
-          onCreateOccurrence={handleCreateOccurrence}
-        />
-      </MobileLayout>
-    );
-  }
 
   // Desktop/Web Layout
   return (

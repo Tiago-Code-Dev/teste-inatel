@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
-import { MobileLayout } from '@/components/layout/MobileLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { 
   TimelineContainer, 
   TimeRangeSelector, 
@@ -133,28 +133,26 @@ export default function MobileTireHistoryPage() {
 
   if (tireLoading) {
     return (
-      <MobileLayout showBackButton title="Carregando...">
-        <div className="p-4 space-y-4">
+      <MainLayout title="Carregando...">
+        <div className="space-y-4">
           <Skeleton className="h-24 w-full rounded-xl" />
           <Skeleton className="h-10 w-full" />
           <Skeleton className="h-64 w-full" />
         </div>
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
   if (tireError || !tire) {
     return (
-      <MobileLayout showBackButton title="Erro">
-        <div className="p-4">
-          <StateDisplay
-            state="error"
-            title="Pneu não encontrado"
-            description="O pneu solicitado não existe ou você não tem permissão para acessá-lo."
-            action={{ label: 'Voltar', onClick: handleBack }}
-          />
-        </div>
-      </MobileLayout>
+      <MainLayout title="Erro">
+        <StateDisplay
+          state="error"
+          title="Pneu não encontrado"
+          description="O pneu solicitado não existe ou você não tem permissão para acessá-lo."
+          action={{ label: 'Voltar', onClick: handleBack }}
+        />
+      </MainLayout>
     );
   }
 
@@ -163,8 +161,7 @@ export default function MobileTireHistoryPage() {
   const activeFiltersCount = eventTypeFilter.length;
 
   return (
-    <MobileLayout 
-      showBackButton 
+    <MainLayout 
       title="Histórico"
       subtitle={tire.serial}
     >
@@ -193,8 +190,8 @@ export default function MobileTireHistoryPage() {
 
         {/* Compact Tire Info Header */}
         <div className={cn(
-          'p-4 border-b bg-card',
-          isLowPressure && 'border-b-status-critical/50'
+          'p-4 border-b bg-card rounded-lg mb-4',
+          isLowPressure && 'border-status-critical/50'
         )}>
           <div className="flex items-center gap-3">
             <div className={cn(
@@ -242,7 +239,7 @@ export default function MobileTireHistoryPage() {
         </div>
 
         {/* Quick Time Range + Filter Button */}
-        <div className="p-3 border-b bg-background flex items-center justify-between gap-3">
+        <div className="p-3 border rounded-lg bg-background flex items-center justify-between gap-3 mb-4">
           <TimeRangeSelector
             value={timeRange}
             onChange={setTimeRange}
@@ -286,7 +283,7 @@ export default function MobileTireHistoryPage() {
         </div>
 
         {/* Actions Bar */}
-        <div className="px-4 py-2 flex items-center justify-between bg-muted/30">
+        <div className="px-4 py-2 flex items-center justify-between bg-muted/30 rounded-lg mb-4">
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
               {filteredEvents.length} evento{filteredEvents.length !== 1 ? 's' : ''}
@@ -311,7 +308,7 @@ export default function MobileTireHistoryPage() {
         {/* Timeline with pull-to-refresh */}
         <div 
           ref={scrollContainerRef}
-          className="flex-1 overflow-auto p-4 pb-24"
+          className="flex-1 overflow-auto pb-24"
           onTouchStart={handleTouchStart}
           onTouchMove={handleTouchMove}
           onTouchEnd={handleTouchEnd}
@@ -336,6 +333,6 @@ export default function MobileTireHistoryPage() {
         onOpenChange={setIsEventDetailOpen}
         onCreateOccurrence={handleCreateOccurrence}
       />
-    </MobileLayout>
+    </MainLayout>
   );
 }
