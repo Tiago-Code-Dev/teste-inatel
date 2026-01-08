@@ -17,7 +17,6 @@ import CommandCenterPage from "./pages/CommandCenterPage";
 import OperationPage from "./pages/OperationPage";
 import MachinesPage from "./pages/MachinesPage";
 import MachineDetailPage from "./pages/MachineDetailPage";
-import AlertsPage from "./pages/AlertsPage";
 import OccurrencesPage from "./pages/OccurrencesPage";
 import NewOccurrencePage from "./pages/NewOccurrencePage";
 import TiresPage from "./pages/TiresPage";
@@ -35,6 +34,8 @@ import BusinessIntelligencePage from "./pages/BusinessIntelligencePage";
 import LoadAnalysisPage from "./pages/LoadAnalysisPage";
 import AdvancedAnalyticsPage from "./pages/AdvancedAnalyticsPage";
 import DevicesPage from "./pages/DevicesPage";
+import NewDevicePage from "./pages/NewDevicePage";
+import NewTirePage from "./pages/NewTirePage";
 import VehicleDetailPage from "./pages/VehicleDetailPage";
 import TireDetailPage from "./pages/TireDetailPage";
 import PressureHistoryPage from "./pages/PressureHistoryPage";
@@ -62,7 +63,7 @@ const App = () => (
                     <Route path="/team-operations" element={<OperationPage />} />
                     <Route path="/machines" element={<MachinesPage />} />
                     <Route path="/machines/:id" element={<MachineDetailPage />} />
-                    <Route path="/alerts" element={<AlertsPage />} />
+                    <Route path="/alerts" element={<CommandCenterPage />} />
                     <Route path="/occurrences" element={<OccurrencesPage />} />
                     <Route path="/occurrences/new" element={<NewOccurrencePage />} />
                     <Route path="/tires" element={<TiresPage />} />
@@ -80,7 +81,9 @@ const App = () => (
                     <Route path="/load" element={<LoadAnalysisPage />} />
                     <Route path="/analytics" element={<AdvancedAnalyticsPage />} />
                     <Route path="/devices" element={<DevicesPage />} />
+                    <Route path="/devices/new" element={<NewDevicePage />} />
                     <Route path="/devices/:id" element={<VehicleDetailPage />} />
+                    <Route path="/tires/new" element={<NewTirePage />} />
                     <Route path="/tires/:id" element={<TireDetailPage />} />
                     <Route path="/pressure-history/:id" element={<PressureHistoryPage />} />
                     {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

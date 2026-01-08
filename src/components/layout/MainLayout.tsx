@@ -2,14 +2,16 @@ import { ReactNode, useState } from 'react';
 import { AppSidebar } from './AppSidebar';
 import { TopBar } from './TopBar';
 import { MobileNav } from './MobileNav';
+import { Breadcrumbs } from './Breadcrumbs';
 
 interface MainLayoutProps {
   children: ReactNode;
   title: string;
   subtitle?: string;
+  showBreadcrumbs?: boolean;
 }
 
-export function MainLayout({ children, title, subtitle }: MainLayoutProps) {
+export function MainLayout({ children, title, subtitle, showBreadcrumbs = true }: MainLayoutProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
@@ -23,7 +25,8 @@ export function MainLayout({ children, title, subtitle }: MainLayoutProps) {
           subtitle={subtitle} 
           onMenuClick={() => setMobileMenuOpen(true)} 
         />
-        <main className="p-4 lg:p-6">
+        <main id="main-content" className="p-4 lg:p-6">
+          {showBreadcrumbs && <Breadcrumbs />}
           {children}
         </main>
       </div>

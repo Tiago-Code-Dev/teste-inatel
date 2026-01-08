@@ -51,22 +51,19 @@ const navGroups: NavGroup[] = [
     ],
   },
   {
-    title: 'Ativos',
-    icon: Smartphone,
+    title: 'Frota',
+    icon: Truck,
     items: [
       { name: 'Dispositivos', href: '/devices', icon: Smartphone },
-      { name: 'Máquinas', href: '/machines', icon: Truck },
       { name: 'Pneus', href: '/tires', icon: CircleDot },
-      { name: 'Frota', href: '/fleet', icon: Truck },
     ],
   },
   {
-    title: 'Monitoramento',
+    title: 'Operações',
     icon: Activity,
     items: [
-      { name: 'Telemetria', href: '/telemetry', icon: Activity },
-      { name: 'Alertas', href: '/alerts', icon: AlertTriangle },
       { name: 'Ocorrências', href: '/occurrences', icon: FileText },
+      { name: 'Telemetria', href: '/telemetry', icon: Activity },
       { name: 'Geolocalização', href: '/geolocation', icon: MapPin },
     ],
   },
@@ -75,7 +72,7 @@ const navGroups: NavGroup[] = [
     icon: BarChart3,
     items: [
       { name: 'Business Intelligence', href: '/bi', icon: BarChart3 },
-      { name: 'Analytics Avançado', href: '/analytics', icon: TrendingUp },
+      { name: 'Analytics', href: '/analytics', icon: TrendingUp },
       { name: 'Custos', href: '/costs', icon: DollarSign },
       { name: 'Desgaste', href: '/wear', icon: Gauge },
       { name: 'Calibração', href: '/calibration', icon: Target },
