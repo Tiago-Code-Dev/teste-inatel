@@ -7,6 +7,7 @@ import { UnderlineTabSystem, DeviceCard } from "@/components/inatel";
 import { useTenant } from "@/contexts/TenantContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 // Helper to get tire status based on pressure
 const getTireStatus = (currentPressure: number | null, recommendedPressure: number) => {
@@ -97,41 +98,30 @@ export default function DevicesPage() {
   );
 
   return (
-    <div className="flex flex-col h-full bg-background">
-      {/* Header */}
-      <header className="sticky top-0 z-10 bg-background border-b">
-        <div className="flex items-center justify-between p-4">
-          <h1 className="text-xl font-bold text-foreground">Dispositivos</h1>
-          <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon">
-              <Search className="w-5 h-5" />
-            </Button>
-            <Button variant="ghost" size="icon">
-              <User className="w-5 h-5" />
-            </Button>
+    <MainLayout title="Dispositivos" subtitle={`${activeTab === "vehicle" ? filteredMachines.length : filteredTires.length} ${activeTab === "vehicle" ? "veículos" : "pneus"}`}>
+      <div className="flex flex-col h-full">
+        {/* Search and Tabs */}
+        <div className="sticky top-0 z-10 bg-background border-b">
+          {/* Search Input */}
+          <div className="p-4 pb-3">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <Input
+                placeholder="Buscar dispositivo..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-10"
+              />
+            </div>
           </div>
-        </div>
 
-        {/* Search Input */}
-        <div className="px-4 pb-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              placeholder="Buscar dispositivo..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10"
-            />
-          </div>
+          {/* Tabs */}
+          <UnderlineTabSystem
+            tabs={tabs}
+            activeTab={activeTab}
+            onTabChange={(id) => setActiveTab(id as TabType)}
+          />
         </div>
-
-        {/* Tabs */}
-        <UnderlineTabSystem
-          tabs={tabs}
-          activeTab={activeTab}
-          onTabChange={(id) => setActiveTab(id as TabType)}
-        />
-      </header>
 
       {/* Content */}
       <main className="flex-1 overflow-auto p-4 space-y-3">
@@ -206,6 +196,7 @@ export default function DevicesPage() {
           {activeTab === "vehicle" ? "ADICIONAR VEÍCULO" : "ADICIONAR PNEU"}
         </Button>
       </div>
-    </div>
+      </div>
+    </MainLayout>
   );
 }

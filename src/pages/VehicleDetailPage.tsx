@@ -13,6 +13,7 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeTelemetry } from "@/hooks/useRealtimeTelemetry";
+import { MainLayout } from "@/components/layout/MainLayout";
 
 export default function VehicleDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -130,17 +131,20 @@ export default function VehicleDetailPage() {
 
   if (!machine) {
     return (
-      <div className="flex flex-col items-center justify-center h-full p-4">
-        <p className="text-muted-foreground">Veículo não encontrado</p>
-        <Button variant="link" onClick={() => navigate("/devices")}>
-          Voltar para lista
-        </Button>
-      </div>
+      <MainLayout title="Veículo não encontrado">
+        <div className="flex flex-col items-center justify-center h-[60vh] p-4">
+          <p className="text-muted-foreground">Veículo não encontrado</p>
+          <Button variant="link" onClick={() => navigate("/devices")}>
+            Voltar para lista
+          </Button>
+        </div>
+      </MainLayout>
     );
   }
 
   return (
-    <div className="flex flex-col h-full bg-background">
+    <MainLayout title={machine.name} subtitle={machine.model}>
+      <div className="flex flex-col h-full">
       {/* Header */}
       <header className="sticky top-0 z-10 bg-background border-b">
         <div className="flex items-center gap-3 p-4">
@@ -253,7 +257,8 @@ export default function VehicleDetailPage() {
           />
         )}
       </main>
-    </div>
+      </div>
+    </MainLayout>
   );
 }
 

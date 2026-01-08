@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { MobileLayout } from '@/components/layout/MobileLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { StateDisplay } from '@/components/shared/StateDisplay';
 import { 
   OccurrenceCard,
@@ -625,21 +625,18 @@ const CommandCenterPage = () => {
 
   if (isLoading && !alerts && !occurrences) {
     return (
-      <MobileLayout title="Centro de Operações" alertCount={stats.critical}>
+      <MainLayout title="Centro de Operações" subtitle="Carregando...">
         <StateDisplay state="loading" className="h-[60vh]" />
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
   return (
-    <MobileLayout 
+    <MainLayout 
       title="Centro de Operações" 
       subtitle={`${stats.critical} críticos • ${filteredAlerts.length} alertas • ${filteredOccurrences.filter(o => !['closed', 'resolved'].includes(o.status)).length} ocorrências`}
-      alertCount={stats.critical}
-      showFAB
-      fabHref="/occurrences/new"
     >
-      <div className="p-4 space-y-4">
+      <div className="p-4 space-y-4 pb-20 lg:pb-6">
         {/* Header with Search and Filters */}
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
@@ -956,7 +953,7 @@ const CommandCenterPage = () => {
         alertMessage={alertToResolve?.message}
         loading={resolveMutation.isPending}
       />
-    </MobileLayout>
+    </MainLayout>
   );
 };
 
