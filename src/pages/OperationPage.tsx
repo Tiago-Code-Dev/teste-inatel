@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { MobileLayout } from '@/components/layout/MobileLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { MachineCard } from '@/components/shared/MachineCard';
 import { MetricCard } from '@/components/shared/MetricCard';
 import { StateDisplay } from '@/components/shared/StateDisplay';
@@ -95,15 +95,15 @@ const OperationPage = () => {
 
   if (machinesLoading) {
     return (
-      <MobileLayout title="Operação" showFAB fabHref="/occurrences/new" alertCount={openAlerts}>
+      <MainLayout title="Operação" subtitle="Carregando...">
         <StateDisplay state="loading" className="h-[60vh]" />
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
   if (machinesError) {
     return (
-      <MobileLayout title="Operação" alertCount={openAlerts}>
+      <MainLayout title="Operação">
         <StateDisplay 
           state={isOnline ? 'error' : 'offline'} 
           className="h-[60vh]"
@@ -112,17 +112,14 @@ const OperationPage = () => {
             onClick: () => refetch(),
           }}
         />
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
   return (
-    <MobileLayout 
+    <MainLayout 
       title="Operação" 
       subtitle={`${sortedMachines.length} máquinas em operação`}
-      showFAB 
-      fabHref="/occurrences/new" 
-      alertCount={openAlerts}
     >
       <div className="p-4 space-y-6">
         {/* Quick Stats */}
@@ -175,7 +172,7 @@ const OperationPage = () => {
           )}
         </div>
       </div>
-    </MobileLayout>
+    </MainLayout>
   );
 };
 
