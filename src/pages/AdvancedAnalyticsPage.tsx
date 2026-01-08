@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { MobileLayout } from '@/components/layout/MobileLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { StateDisplay } from '@/components/shared/StateDisplay';
 import { useAdvancedAnalytics, useTeamPerformance, TimeRange } from '@/hooks/useAdvancedAnalytics';
 import {
@@ -44,9 +44,9 @@ const AdvancedAnalyticsPage = () => {
 
   if (isLoading && !metrics) {
     return (
-      <MobileLayout title="Analytics Avançado">
+      <MainLayout title="Analytics Avançado">
         <StateDisplay state="loading" className="h-[60vh]" />
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
@@ -58,11 +58,11 @@ const AdvancedAnalyticsPage = () => {
   };
 
   return (
-    <MobileLayout 
+    <MainLayout 
       title="Analytics Avançado"
       subtitle="Métricas de performance e insights"
     >
-      <div className="p-4 space-y-6">
+      <div className="space-y-6">
         {/* Header with time range selector */}
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
@@ -249,7 +249,7 @@ const AdvancedAnalyticsPage = () => {
           </CardContent>
         </Card>
       </div>
-    </MobileLayout>
+    </MainLayout>
   );
 };
 

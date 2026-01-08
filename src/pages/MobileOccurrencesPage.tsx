@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { MobileLayout } from '@/components/layout/MobileLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { OfflineSyncChip, SyncStatus } from '@/components/shared/OfflineSyncChip';
 import { StateDisplay } from '@/components/shared/StateDisplay';
 import { Badge } from '@/components/ui/badge';
@@ -90,32 +90,30 @@ const MobileOccurrencesPage = () => {
 
   if (isLoading) {
     return (
-      <MobileLayout title="Ocorrências" showFAB fabHref="/occurrences/new">
+      <MainLayout title="Ocorrências" subtitle="Carregando...">
         <StateDisplay state="loading" className="h-[60vh]" />
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
   if (error) {
     return (
-      <MobileLayout title="Ocorrências" showFAB fabHref="/occurrences/new">
+      <MainLayout title="Ocorrências">
         <StateDisplay 
           state="error" 
           className="h-[60vh]"
           action={{ label: 'Tentar novamente', onClick: () => refetch() }}
         />
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
   return (
-    <MobileLayout 
+    <MainLayout 
       title="Ocorrências" 
       subtitle={`${openCount} em aberto`}
-      showFAB 
-      fabHref="/occurrences/new"
     >
-      <div className="p-4 space-y-4">
+      <div className="space-y-4">
         {/* Quick Stats */}
         <div className="flex items-center gap-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
           <FileText className="w-5 h-5 text-primary" />
@@ -215,7 +213,7 @@ const MobileOccurrencesPage = () => {
           />
         )}
       </div>
-    </MobileLayout>
+    </MainLayout>
   );
 };
 

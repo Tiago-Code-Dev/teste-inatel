@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { MobileLayout } from '@/components/layout/MobileLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { 
@@ -36,8 +36,8 @@ export default function ProfilePage() {
     : user?.email?.slice(0, 2).toUpperCase() || 'U';
 
   return (
-    <MobileLayout title="Perfil">
-      <div className="p-4 space-y-6">
+    <MainLayout title="Perfil">
+      <div className="max-w-2xl mx-auto space-y-6">
         {/* User Card */}
         <div className="card-elevated p-6 flex items-center gap-4">
           <Avatar className="w-16 h-16">
@@ -90,6 +90,6 @@ export default function ProfilePage() {
           TireWatch Pro v1.0.0
         </p>
       </div>
-    </MobileLayout>
+    </MainLayout>
   );
 }

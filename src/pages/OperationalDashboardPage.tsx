@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
-import { MobileLayout } from '@/components/layout/MobileLayout';
+import { MainLayout } from '@/components/layout/MainLayout';
 import { StateDisplay } from '@/components/shared/StateDisplay';
 import { 
   MachineStatusCard, 
@@ -398,21 +398,18 @@ const OperationalDashboardPage = () => {
 
   if (isLoading && !machines && !alerts) {
     return (
-      <MobileLayout title="Painel Operacional" alertCount={stats.openAlerts}>
+      <MainLayout title="Painel Operacional">
         <StateDisplay state="loading" className="h-[60vh]" />
-      </MobileLayout>
+      </MainLayout>
     );
   }
 
   return (
-    <MobileLayout 
+    <MainLayout 
       title="Painel Operacional" 
       subtitle={`${sortedMachines.length} máquinas • ${stats.openAlerts} alertas`}
-      alertCount={stats.openAlerts}
-      showFAB
-      fabHref="/occurrences/new"
     >
-      <div className="p-4 space-y-6">
+      <div className="space-y-6">
         {/* Header Actions */}
         <motion.div 
           initial={{ opacity: 0, y: -10 }}
@@ -498,17 +495,8 @@ const OperationalDashboardPage = () => {
                     transition={{ delay: index * 0.03 }}
                   >
                     <MachineStatusCard
-                      machine={{
-                        id: machine.id,
-                        name: machine.name,
-                        model: machine.model,
-                        status: machine.status,
-                        lastTelemetryAt: machine.last_telemetry_at,
-                      }}
-                      alertCount={alerts?.filter(a => a.machine_id === machine.id && a.status === 'open').length}
-                      onViewAlerts={() => {
-                        setActiveTab('alerts');
-                      }}
+                      machine={{...machine, lastTelemetryAt: machine.last_telemetry_at}}
+                      onClick={() => navigate(`/machines/${machine.id}`)}
                     />
                   </motion.div>
                 ))
@@ -516,7 +504,7 @@ const OperationalDashboardPage = () => {
                 <StateDisplay
                   state="empty"
                   title="Nenhuma máquina"
-                  description="Não há máquinas cadastradas"
+                  description="Adicione máquinas para monitorar"
                 />
               )}
             </AnimatePresence>
@@ -528,63 +516,45 @@ const OperationalDashboardPage = () => {
               selectedSeverities={selectedSeverities}
               selectedStatuses={selectedStatuses}
               selectedPeriod={selectedPeriod}
+              counts={counts}
               onSeverityToggle={handleSeverityToggle}
               onStatusToggle={handleStatusToggle}
               onPeriodChange={setSelectedPeriod}
-              onClearFilters={handleClearFilters}
-              counts={counts}
             />
 
-            <div className="space-y-3">
-              <AnimatePresence mode="popLayout">
-                {filteredAlerts.length > 0 ? (
-                  filteredAlerts.map((alert, index) => (
+            <AnimatePresence mode="popLayout">
+              {filteredAlerts.length > 0 ? (
+                <div className="space-y-3">
+                  {filteredAlerts.map((alert, index) => (
                     <motion.div
                       key={alert.id}
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95 }}
+                      exit={{ opacity: 0, y: -10 }}
                       transition={{ delay: index * 0.03 }}
                     >
                       <AlertTriageCard
-                        alert={{
-                          id: alert.id,
-                          type: alert.type,
-                          severity: alert.severity,
-                          status: alert.status,
-                          message: alert.message,
-                          reason: alert.reason,
-                          probable_cause: alert.probable_cause,
-                          recommended_action: alert.recommended_action,
-                          opened_at: alert.opened_at,
-                          machine: alert.machines,
-                          tire: alert.tires,
-                          assigned_to: alert.acknowledged_by,
-                        }}
-                        onViewDetails={handleViewAlertDetails}
-                        onAssign={handleOpenAssignment}
-                        onAcknowledge={(id) => acknowledgeMutation.mutate(id)}
-                        onCreateOccurrence={(id) => navigate(`/occurrences/new?alert=${id}`)}
-                        loading={acknowledgeMutation.isPending}
+                        alert={alert}
+                        onAcknowledge={() => acknowledgeMutation.mutate(alert.id)}
+                        onAssign={() => handleOpenAssignment(alert.id)}
+                        onViewDetails={() => handleViewAlertDetails(alert.id)}
+                        onCreateOccurrence={() => navigate(`/occurrences/new?alertId=${alert.id}`)}
                       />
                     </motion.div>
-                  ))
-                ) : (
-                  <StateDisplay
-                    state="empty"
-                    title="Nenhum alerta"
-                    description={selectedSeverities.length > 0 || selectedStatuses.length > 0 
-                      ? "Nenhum alerta corresponde aos filtros selecionados"
-                      : "Não há alertas no período selecionado"
-                    }
-                    action={{
-                      label: 'Limpar filtros',
-                      onClick: handleClearFilters,
-                    }}
-                  />
-                )}
-              </AnimatePresence>
-            </div>
+                  ))}
+                </div>
+              ) : (
+                <StateDisplay
+                  state="empty"
+                  title="Nenhum alerta"
+                  description="Não há alertas para os filtros selecionados"
+                  action={{
+                    label: 'Limpar filtros',
+                    onClick: handleClearFilters,
+                  }}
+                />
+              )}
+            </AnimatePresence>
           </TabsContent>
 
           {/* Occurrences Tab */}
@@ -600,17 +570,7 @@ const OperationalDashboardPage = () => {
                     transition={{ delay: index * 0.03 }}
                   >
                     <OccurrenceCard
-                      occurrence={{
-                        id: occurrence.id,
-                        status: occurrence.status,
-                        description: occurrence.description,
-                        created_at: occurrence.created_at,
-                        machine: occurrence.machines,
-                        is_offline_created: occurrence.is_offline_created,
-                        media_count: occurrence.media_attachments.length,
-                        media_types: occurrence.media_attachments.map(m => m.type),
-                      }}
-                      onViewDetails={(id) => navigate(`/occurrences/${id}`)}
+                      occurrence={occurrence}
                     />
                   </motion.div>
                 ))
@@ -619,6 +579,10 @@ const OperationalDashboardPage = () => {
                   state="empty"
                   title="Nenhuma ocorrência"
                   description="Registre uma nova ocorrência quando identificar um problema"
+                  action={{
+                    label: 'Nova ocorrência',
+                    onClick: () => navigate('/occurrences/new'),
+                  }}
                 />
               )}
             </AnimatePresence>
@@ -635,46 +599,24 @@ const OperationalDashboardPage = () => {
 
       {/* Alert Detail Sheet */}
       <AlertDetailSheet
+        alert={selectedAlert}
         open={detailSheetOpen}
         onOpenChange={setDetailSheetOpen}
-        alert={selectedAlert ? {
-          id: selectedAlert.id,
-          type: selectedAlert.type,
-          severity: selectedAlert.severity,
-          status: selectedAlert.status,
-          message: selectedAlert.message,
-          reason: selectedAlert.reason,
-          probable_cause: selectedAlert.probable_cause,
-          recommended_action: selectedAlert.recommended_action,
-          opened_at: selectedAlert.opened_at,
-          machine: selectedAlert.machines,
-          tire: selectedAlert.tires,
-          assigned_to: selectedAlert.acknowledged_by,
-        } : null}
-        onAssign={handleOpenAssignment}
-        onAcknowledge={(id) => acknowledgeMutation.mutate(id)}
-        onResolve={(id, comment) => resolveMutation.mutate({ alertId: id, comment })}
-        onCreateOccurrence={(id) => {
-          setDetailSheetOpen(false);
-          navigate(`/occurrences/new?alert=${id}`);
-        }}
-        loading={acknowledgeMutation.isPending || resolveMutation.isPending}
+        onAcknowledge={() => selectedAlert && acknowledgeMutation.mutate(selectedAlert.id)}
+        onResolve={(comment) => selectedAlert && resolveMutation.mutate({ alertId: selectedAlert.id, comment })}
+        onAssign={() => selectedAlert && handleOpenAssignment(selectedAlert.id)}
+        onCreateOccurrence={() => selectedAlert && navigate(`/occurrences/new?alertId=${selectedAlert.id}`)}
       />
 
-      {/* User Assignment Modal */}
+      {/* Assignment Modal */}
       <UserAssignmentModal
         open={assignmentModalOpen}
         onOpenChange={setAssignmentModalOpen}
+        users={profiles?.map(p => ({ id: p.id, name: p.name, avatar_url: p.avatar_url })) || []}
         onAssign={handleAssign}
-        users={profiles?.map(p => ({
-          id: p.id,
-          name: p.name,
-          email: p.email || undefined,
-          avatar_url: p.avatar_url || undefined,
-        })) || []}
         loading={assignMutation.isPending}
       />
-    </MobileLayout>
+    </MainLayout>
   );
 };
 
