@@ -1,67 +1,189 @@
-import { 
-  LayoutDashboard, 
-  Truck, 
-  AlertTriangle, 
-  FileText, 
-  CircleDot,
-  Settings,
-  LogOut,
-  Bell,
-  ChevronRight,
-  Activity,
-  Command,
-  TrendingUp,
-  Users,
-  Droplets,
-  MapPin,
-  BarChart3,
-  DollarSign,
-  Car,
-  Target,
-  Disc,
-  PieChart,
-  Weight,
-  Smartphone
-} from 'lucide-react';
+import { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
-import { Badge } from '@/components/ui/badge';
-import { currentUser, dashboardStats } from '@/data/mockData';
+import { 
+  LayoutDashboard, 
+  Smartphone,
+  Truck,
+  Activity,
+  AlertTriangle,
+  MapPin,
+  BarChart3,
+  Settings,
+  ChevronDown,
+  Gauge,
+  DollarSign,
+  CircleDot,
+  Droplets,
+  Target,
+  Scale,
+  TrendingUp,
+  FileText,
+  Users,
+  LogOut,
+  Command,
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { currentUser } from '@/data/mockData';
 
-const navigation = [
-  { name: 'Dashboard', href: '/', icon: LayoutDashboard },
-  { name: 'Dispositivos', href: '/devices', icon: Smartphone },
-  { name: 'Centro de Operações', href: '/command-center', icon: Command, badge: 3 },
-  { name: 'Gestão de Equipe', href: '/team-operations', icon: Users },
-  { name: 'Máquinas', href: '/machines', icon: Truck },
-  { name: 'Telemetria', href: '/telemetry', icon: Activity },
-  { name: 'Desgaste', href: '/wear', icon: TrendingUp },
-  { name: 'Lastro Líquido', href: '/fluid', icon: Droplets },
-  { name: 'Geolocalização', href: '/geolocation', icon: MapPin },
-  { name: 'Equilíbrio', href: '/balance', icon: BarChart3 },
-  { name: 'Custos', href: '/costs', icon: DollarSign },
-  { name: 'Frota', href: '/fleet', icon: Car },
-  { name: 'Calibração', href: '/calibration', icon: Target },
-  { name: 'Amassamento', href: '/deformation', icon: Disc },
-  { name: 'BI', href: '/bi', icon: PieChart },
-  { name: 'Carga', href: '/load', icon: Weight },
-  { name: 'Alertas', href: '/alerts', icon: AlertTriangle, badge: 7 },
-  { name: 'Ocorrências', href: '/occurrences', icon: FileText, badge: 4 },
-  { name: 'Pneus', href: '/tires', icon: CircleDot },
+interface NavItem {
+  name: string;
+  href: string;
+  icon: typeof LayoutDashboard;
+}
+
+interface NavGroup {
+  title: string;
+  icon: typeof LayoutDashboard;
+  items: NavItem[];
+  defaultOpen?: boolean;
+}
+
+const navGroups: NavGroup[] = [
+  {
+    title: 'Visão Geral',
+    icon: LayoutDashboard,
+    defaultOpen: true,
+    items: [
+      { name: 'Dashboard', href: '/', icon: LayoutDashboard },
+      { name: 'Centro de Operações', href: '/command-center', icon: Command },
+      { name: 'Gestão de Equipe', href: '/team-operations', icon: Users },
+    ],
+  },
+  {
+    title: 'Ativos',
+    icon: Smartphone,
+    items: [
+      { name: 'Dispositivos', href: '/devices', icon: Smartphone },
+      { name: 'Máquinas', href: '/machines', icon: Truck },
+      { name: 'Pneus', href: '/tires', icon: CircleDot },
+      { name: 'Frota', href: '/fleet', icon: Truck },
+    ],
+  },
+  {
+    title: 'Monitoramento',
+    icon: Activity,
+    items: [
+      { name: 'Telemetria', href: '/telemetry', icon: Activity },
+      { name: 'Alertas', href: '/alerts', icon: AlertTriangle },
+      { name: 'Ocorrências', href: '/occurrences', icon: FileText },
+      { name: 'Geolocalização', href: '/geolocation', icon: MapPin },
+    ],
+  },
+  {
+    title: 'Análise',
+    icon: BarChart3,
+    items: [
+      { name: 'Business Intelligence', href: '/bi', icon: BarChart3 },
+      { name: 'Analytics Avançado', href: '/analytics', icon: TrendingUp },
+      { name: 'Custos', href: '/costs', icon: DollarSign },
+      { name: 'Desgaste', href: '/wear', icon: Gauge },
+      { name: 'Calibração', href: '/calibration', icon: Target },
+      { name: 'Deformação', href: '/deformation', icon: CircleDot },
+      { name: 'Carga', href: '/load', icon: Scale },
+      { name: 'Fluido & Lastro', href: '/fluid', icon: Droplets },
+    ],
+  },
 ];
 
-const secondaryNav = [
-  { name: 'Configurações', href: '/settings', icon: Settings },
-];
-
-export function AppSidebar() {
+function NavGroupAccordion({ group }: { group: NavGroup }) {
   const location = useLocation();
+  const [isOpen, setIsOpen] = useState(
+    group.defaultOpen || group.items.some(item => 
+      location.pathname === item.href || 
+      (item.href !== '/' && location.pathname.startsWith(item.href))
+    )
+  );
+
+  const hasActiveItem = group.items.some(item => 
+    location.pathname === item.href || 
+    (item.href !== '/' && location.pathname.startsWith(item.href))
+  );
 
   return (
-    <aside className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-sidebar border-r border-sidebar-border">
+    <div className="space-y-1">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className={cn(
+          'w-full flex items-center justify-between gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+          'hover:bg-sidebar-accent',
+          hasActiveItem ? 'text-primary' : 'text-sidebar-foreground',
+          'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+        )}
+        aria-expanded={isOpen}
+        aria-label={`${group.title} menu`}
+      >
+        <div className="flex items-center gap-3">
+          <group.icon className="w-4 h-4" aria-hidden="true" />
+          <span>{group.title}</span>
+        </div>
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.2 }}
+          className="motion-reduce:transition-none"
+        >
+          <ChevronDown className="w-4 h-4" aria-hidden="true" />
+        </motion.div>
+      </button>
+
+      <AnimatePresence initial={false}>
+        {isOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden motion-reduce:transition-none"
+          >
+            <div className="pl-4 space-y-1 pt-1">
+              {group.items.map((item) => {
+                const isActive = location.pathname === item.href || 
+                  (item.href !== '/' && location.pathname.startsWith(item.href));
+
+                return (
+                  <Link
+                    key={item.href}
+                    to={item.href}
+                    className={cn(
+                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors',
+                      isActive 
+                        ? 'bg-primary text-primary-foreground font-medium shadow-glow-primary' 
+                        : 'text-sidebar-foreground hover:bg-sidebar-accent',
+                      'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+                    )}
+                    aria-current={isActive ? 'page' : undefined}
+                  >
+                    <item.icon className="w-4 h-4" aria-hidden="true" />
+                    <span>{item.name}</span>
+                  </Link>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+export function AppSidebar() {
+  return (
+    <aside 
+      className="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-sidebar border-r border-sidebar-border"
+      role="navigation"
+      aria-label="Menu principal"
+    >
+      {/* Skip link for accessibility */}
+      <a 
+        href="#main-content" 
+        className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+      >
+        Pular para conteúdo principal
+      </a>
+
       {/* Logo */}
       <div className="flex items-center gap-3 px-6 py-5 border-b border-sidebar-border">
-        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary">
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary" aria-hidden="true">
           <CircleDot className="w-6 h-6 text-primary-foreground" />
         </div>
         <div>
@@ -71,74 +193,27 @@ export function AppSidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        <div className="mb-2 px-3">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Monitoramento
-          </p>
-        </div>
-        {navigation.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group',
-                isActive
-                  ? 'bg-primary text-primary-foreground shadow-glow-primary'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent'
-              )}
-            >
-              <item.icon className={cn(
-                'w-5 h-5 flex-shrink-0',
-                isActive ? 'text-primary-foreground' : 'text-muted-foreground group-hover:text-sidebar-foreground'
-              )} />
-              <span className="flex-1">{item.name}</span>
-              {item.badge && (
-                <Badge 
-                  variant={isActive ? 'secondary' : 'default'}
-                  className={cn(
-                    'min-w-[1.5rem] h-5 flex items-center justify-center text-xs',
-                    isActive 
-                      ? 'bg-primary-foreground/20 text-primary-foreground' 
-                      : 'bg-status-critical text-white'
-                  )}
-                >
-                  {item.badge}
-                </Badge>
-              )}
-              {isActive && (
-                <ChevronRight className="w-4 h-4 text-primary-foreground/70" />
-              )}
-            </Link>
-          );
-        })}
-
-        <div className="pt-6 mb-2 px-3">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-            Sistema
-          </p>
-        </div>
-        {secondaryNav.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <Link
-              key={item.name}
-              to={item.href}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent'
-              )}
-            >
-              <item.icon className="w-5 h-5 text-muted-foreground group-hover:text-sidebar-foreground" />
-              <span>{item.name}</span>
-            </Link>
-          );
-        })}
+      <nav className="flex-1 overflow-y-auto py-4 px-3 space-y-2">
+        {navGroups.map((group) => (
+          <NavGroupAccordion key={group.title} group={group} />
+        ))}
       </nav>
+
+      {/* Settings */}
+      <div className="px-3 py-2 border-t border-sidebar-border">
+        <Link
+          to="/settings"
+          className={cn(
+            'flex items-center gap-3 px-3 py-2 rounded-lg text-sm text-sidebar-foreground transition-colors',
+            'hover:bg-sidebar-accent',
+            'focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2'
+          )}
+          aria-label="Configurações"
+        >
+          <Settings className="w-4 h-4" aria-hidden="true" />
+          <span>Configurações</span>
+        </Link>
+      </div>
 
       {/* User section */}
       <div className="p-3 border-t border-sidebar-border">
@@ -156,8 +231,11 @@ export function AppSidebar() {
               {currentUser.role === 'manager' ? 'Gestor' : currentUser.role}
             </p>
           </div>
-          <button className="p-2 rounded-lg hover:bg-background/50 transition-colors">
-            <LogOut className="w-4 h-4 text-muted-foreground" />
+          <button 
+            className="p-2 rounded-lg hover:bg-background/50 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label="Sair"
+          >
+            <LogOut className="w-4 h-4 text-muted-foreground" aria-hidden="true" />
           </button>
         </div>
       </div>
