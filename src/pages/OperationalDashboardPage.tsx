@@ -496,7 +496,6 @@ const OperationalDashboardPage = () => {
                   >
                     <MachineStatusCard
                       machine={{...machine, lastTelemetryAt: machine.last_telemetry_at}}
-                      onClick={() => navigate(`/machines/${machine.id}`)}
                     />
                   </motion.div>
                 ))
@@ -520,6 +519,11 @@ const OperationalDashboardPage = () => {
               onSeverityToggle={handleSeverityToggle}
               onStatusToggle={handleStatusToggle}
               onPeriodChange={setSelectedPeriod}
+              onClearFilters={() => {
+                setSelectedSeverities([]);
+                setSelectedStatuses([]);
+                setSelectedPeriod('all');
+              }}
             />
 
             <AnimatePresence mode="popLayout">
