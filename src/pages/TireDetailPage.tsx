@@ -16,6 +16,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeTelemetry } from "@/hooks/useRealtimeTelemetry";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { DetailPageSkeleton } from "@/components/shared/PageSkeletons";
 
 export default function TireDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -182,8 +183,8 @@ export default function TireDetailPage() {
   if (tireLoading) {
     return (
       <MainLayout title="Carregando...">
-        <div className="flex flex-col items-center justify-center h-[60vh] p-4">
-          <p className="text-muted-foreground">Carregando dados do pneu...</p>
+        <div className="p-4">
+          <DetailPageSkeleton />
         </div>
       </MainLayout>
     );

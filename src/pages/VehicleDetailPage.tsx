@@ -14,6 +14,7 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useRealtimeTelemetry } from "@/hooks/useRealtimeTelemetry";
 import { MainLayout } from "@/components/layout/MainLayout";
+import { DetailPageSkeleton } from "@/components/shared/PageSkeletons";
 
 export default function VehicleDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,7 +22,7 @@ export default function VehicleDetailPage() {
   const [activeTab, setActiveTab] = useState("geral");
   const [selectedTirePosition, setSelectedTirePosition] = useState<number | undefined>();
 
-  const { data: machine } = useQuery({
+  const { data: machine, isLoading: machineLoading } = useQuery({
     queryKey: ['machine-detail', id],
     queryFn: async () => {
       const { data, error } = await supabase.from('machines').select('*').eq('id', id).single();
@@ -128,6 +129,16 @@ export default function VehicleDetailPage() {
         );
     }
   };
+
+  if (machineLoading) {
+    return (
+      <MainLayout title="Carregando...">
+        <div className="p-4">
+          <DetailPageSkeleton />
+        </div>
+      </MainLayout>
+    );
+  }
 
   if (!machine) {
     return (
