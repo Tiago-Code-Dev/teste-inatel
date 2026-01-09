@@ -2,6 +2,7 @@ import { MainLayout } from '@/components/layout/MainLayout';
 import { TireTimeline } from '@/components/shared/TireTimeline';
 import { TelemetryChart } from '@/components/shared/TelemetryChart';
 import { StatusBadge } from '@/components/shared/StatusBadge';
+import { DetailPageSkeleton } from '@/components/shared/PageSkeletons';
 import { machines, tires, generateTelemetryHistory, tireTimeline } from '@/data/mockData';
 import { useParams, Link } from 'react-router-dom';
 import { 

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { StateDisplay } from '@/components/shared/StateDisplay';
+import { AnalyticsPageSkeleton } from '@/components/shared/PageSkeletons';
 import { useAdvancedAnalytics, useTeamPerformance, TimeRange } from '@/hooks/useAdvancedAnalytics';
 import {
   AnalyticsKPICard,
@@ -45,7 +45,9 @@ const AdvancedAnalyticsPage = () => {
   if (isLoading && !metrics) {
     return (
       <MainLayout title="Analytics Avançado">
-        <StateDisplay state="loading" className="h-[60vh]" />
+        <div className="p-4">
+          <AnalyticsPageSkeleton />
+        </div>
       </MainLayout>
     );
   }

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Plus, Search, User, Truck, CircleDot } from "lucide-react";
+import { Plus, Search, Truck, CircleDot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { UnderlineTabSystem, DeviceCard } from "@/components/inatel";
@@ -8,7 +8,7 @@ import { useTenant } from "@/contexts/TenantContext";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { MainLayout } from "@/components/layout/MainLayout";
-
+import { DeviceCardSkeleton } from "@/components/shared/PageSkeletons";
 // Helper to get tire status based on pressure
 const getTireStatus = (currentPressure: number | null, recommendedPressure: number) => {
   if (currentPressure === null) return "sem_comunicacao" as const;
@@ -127,11 +127,8 @@ export default function DevicesPage() {
       <main className="flex-1 overflow-auto p-4 space-y-3">
         {isLoading ? (
           <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <div
-                key={i}
-                className="h-20 bg-muted animate-pulse rounded-xl"
-              />
+            {[1, 2, 3, 4, 5].map((i) => (
+              <DeviceCardSkeleton key={i} />
             ))}
           </div>
         ) : activeTab === "vehicle" ? (

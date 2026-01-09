@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/layout/MainLayout';
-import { MobileLayout } from '@/components/layout/MobileLayout';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { CircleDot, Truck, Calendar, Gauge, AlertTriangle, ChevronRight, Search } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -9,12 +8,11 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
-import { Skeleton } from '@/components/ui/skeleton';
 import { StateDisplay } from '@/components/shared/StateDisplay';
+import { TireCardSkeleton } from '@/components/shared/PageSkeletons';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import { useState, useMemo } from 'react';
-
 const lifecycleLabels: Record<string, { label: string; className: string }> = {
   new: { label: 'Novo', className: 'bg-status-ok/15 text-status-ok' },
   in_use: { label: 'Em uso', className: 'bg-primary/15 text-primary' },
@@ -58,24 +56,7 @@ interface TireWithMachine {
   machines: { id: string; name: string; model: string } | null;
 }
 
-function TireCardSkeleton() {
-  return (
-    <div className="card-elevated p-5">
-      <div className="flex items-start justify-between mb-4">
-        <div className="flex items-center gap-3">
-          <Skeleton className="w-12 h-12 rounded-xl" />
-          <div>
-            <Skeleton className="h-5 w-24 mb-1" />
-            <Skeleton className="h-4 w-16" />
-          </div>
-        </div>
-        <Skeleton className="h-6 w-16 rounded-full" />
-      </div>
-      <Skeleton className="h-20 w-full rounded-lg mb-4" />
-      <Skeleton className="h-4 w-32" />
-    </div>
-  );
-}
+// TireCardSkeleton is now imported from PageSkeletons
 
 function TireCard({ tire, index }: { tire: TireWithMachine; index: number }) {
   const isLow = tire.current_pressure && tire.current_pressure < tire.recommended_pressure * 0.85;
@@ -337,13 +318,7 @@ const TiresPage = () => {
     </div>
   );
 
-  if (isMobile) {
-    return (
-      <MobileLayout title="Pneus" subtitle={`${stats.total} pneus`}>
-        {content}
-      </MobileLayout>
-    );
-  }
+  // Use MainLayout for both mobile and desktop for consistent navigation
 
   return (
     <MainLayout 

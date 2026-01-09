@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { MainLayout } from '@/components/layout/MainLayout';
 import { StateDisplay } from '@/components/shared/StateDisplay';
+import { CommandCenterSkeleton } from '@/components/shared/PageSkeletons';
 import { 
   OccurrenceCard,
   AlertDetailSheet,
@@ -626,7 +627,9 @@ const CommandCenterPage = () => {
   if (isLoading && !alerts && !occurrences) {
     return (
       <MainLayout title="Centro de Operações" subtitle="Carregando...">
-        <StateDisplay state="loading" className="h-[60vh]" />
+        <div className="p-4">
+          <CommandCenterSkeleton />
+        </div>
       </MainLayout>
     );
   }
