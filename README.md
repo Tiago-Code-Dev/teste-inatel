@@ -1,267 +1,129 @@
-# Documentação Técnica - TireWatch Pro
+# 🚜 TireWatch Pro
 
-Bem-vindo à documentação técnica completa do **TireWatch Pro**, uma plataforma SaaS de monitoramento de pneus para frotas de máquinas agrícolas e industriais, desenvolvida com React, TypeScript e Supabase.
+## O que é este projeto?
 
-## 📚 Índice da Documentação
+O **TireWatch Pro** é um sistema de monitoramento de pneus para tratores e máquinas agrícolas. Pense nele como um "médico dos pneus" que fica de olho na saúde dos pneus da sua frota o tempo todo.
 
-### Introdução e Visão Geral
+### Em palavras simples:
 
-1. **[Visão Geral do Sistema](01-VISAO-GERAL.md)**
-   - Propósito e objetivos
-   - Principais funcionalidades
-   - Stack tecnológica
-   - Requisitos de sistema
+Imagine que você tem uma fazenda com 50 tratores. Cada trator tem pneus que precisam estar com a pressão certa para funcionar bem. 
 
-### Arquitetura e Design
+**Sem o TireWatch Pro:**
+- Você teria que verificar cada pneu manualmente 😓
+- Só descobriria problemas quando já fosse tarde demais 💸
+- Perderia tempo e dinheiro com manutenções de emergência 🚨
 
-2. **[Arquitetura do Sistema](02-ARQUITETURA.md)**
-   - Arquitetura Frontend + BaaS
-   - Padrões de design implementados
-   - Fluxo de dados
-   - Gerenciamento de estado
-
-3. **[Frontend React](03-FRONTEND.md)**
-   - Estrutura de componentes
-   - Contexts e Providers
-   - Custom Hooks
-   - Roteamento
-
-4. **[Componentes](04-COMPONENTES.md)**
-   - Inventário completo (~200 componentes)
-   - Design System (shadcn/ui)
-   - Padrões de componentes
-   - Exemplos de uso
-
-### Backend e Infraestrutura
-
-5. **[Supabase (Backend)](05-SUPABASE.md)**
-   - Visão geral do Supabase
-   - Edge Functions
-   - Realtime subscriptions
-   - Row Level Security (RLS)
-
-6. **[API (Edge Functions)](06-API.md)**
-   - Endpoints disponíveis
-   - Autenticação de requisições
-   - Formatos de request/response
-   - Exemplos práticos
-
-7. **[Autenticação e Autorização](07-AUTENTICACAO.md)**
-   - Supabase Auth
-   - JWT e sessões
-   - Hierarquia de permissões (Roles)
-   - Multi-tenancy
-
-8. **[Banco de Dados](08-BANCO-DE-DADOS.md)**
-   - Modelo de dados (PostgreSQL)
-   - Schemas e tabelas
-   - Relacionamentos
-   - Migrations
-
-### Qualidade e Testes
-
-9. **[Testes](09-TESTES.md)**
-   - Estratégia de testes
-   - Testes unitários
-   - Testes de integração
-   - Cobertura de código
-
-### Infraestrutura e Deploy
-
-10. **[Deploy e CI/CD](10-DEPLOY.md)**
-    - Ambiente Lovable.dev
-    - Processo de deploy
-    - Variáveis de ambiente
-    - Monitoramento
-
-11. **[Configuração](11-CONFIGURACAO.md)**
-    - Variáveis de ambiente
-    - Configuração do Vite
-    - Configuração do Tailwind
-    - TypeScript config
-
-### Guias Práticos
-
-12. **[API Reference](12-API-REFERENCE.md)**
-    - Endpoints completos
-    - Exemplos de request/response
-    - Códigos de status HTTP
-    - Exemplos com cURL
-
-13. **[Guia de Desenvolvimento](13-GUIA-DESENVOLVIMENTO.md)**
-    - Setup inicial
-    - Executando o projeto
-    - Adicionando features
-    - Debugging
-
-14. **[Boas Práticas e Padrões](14-BOAS-PRATICAS.md)**
-    - Convenções de código
-    - Padrões React
-    - TypeScript best practices
-    - Estilização com Tailwind
-
-15. **[Troubleshooting](15-TROUBLESHOOTING.md)**
-    - Problemas comuns
-    - Soluções
-    - Logs e diagnóstico
-    - FAQ
-
-### Planejamento e Referência
-
-16. **[Roadmap e Melhorias Futuras](16-ROADMAP.md)**
-    - Funcionalidades planejadas
-    - Melhorias técnicas
-    - Tecnologias a explorar
-    - Versionamento
+**Com o TireWatch Pro:**
+- Sensores nos pneus enviam dados automaticamente para o sistema 📡
+- Você vê tudo em um painel de controle (dashboard) no computador 💻
+- Se um pneu estiver com problema, você recebe um alerta na hora ⚠️
+- Evita acidentes e economiza dinheiro! 💰
 
 ---
 
-## 🚀 Início Rápido
+## 📁 Estrutura do Projeto
 
-### Para Desenvolvedores
-
-1. **Primeiro Acesso**:
-   - Leia [Visão Geral](01-VISAO-GERAL.md)
-   - Siga o [Guia de Desenvolvimento](13-GUIA-DESENVOLVIMENTO.md)
-   - Configure o ambiente local
-
-2. **Entendendo o Sistema**:
-   - Estude a [Arquitetura](02-ARQUITETURA.md)
-   - Conheça os [Componentes](04-COMPONENTES.md)
-   - Explore a [API Reference](12-API-REFERENCE.md)
-
-3. **Desenvolvendo**:
-   - Siga as [Boas Práticas](14-BOAS-PRATICAS.md)
-   - Consulte [Troubleshooting](15-TROUBLESHOOTING.md) quando necessário
-
-### Para Arquitetos
-
-1. **Arquitetura**:
-   - [Arquitetura do Sistema](02-ARQUITETURA.md)
-   - [Frontend React](03-FRONTEND.md)
-   - [Supabase Backend](05-SUPABASE.md)
-
-2. **Decisões de Design**:
-   - [Boas Práticas](14-BOAS-PRATICAS.md)
-   - [Banco de Dados](08-BANCO-DE-DADOS.md)
-   - [Autenticação](07-AUTENTICACAO.md)
-
-### Para DevOps
-
-1. **Deploy**:
-   - [Deploy e CI/CD](10-DEPLOY.md)
-   - [Configuração](11-CONFIGURACAO.md)
-   - [Troubleshooting](15-TROUBLESHOOTING.md)
-
-### Para QA
-
-1. **Testes**:
-   - [Estratégia de Testes](09-TESTES.md)
-   - [API Reference](12-API-REFERENCE.md)
-
----
-
-## 📖 Como Usar Esta Documentação
-
-### Leitura Progressiva
-
-A documentação foi organizada para leitura progressiva:
-
-1. **Iniciante**: Comece pela Visão Geral e Guia de Desenvolvimento
-2. **Intermediário**: Aprofunde-se em Arquitetura e Componentes
-3. **Avançado**: Estude Boas Práticas e Padrões de Design
-
-### Exemplos Práticos
-
-Todos os documentos incluem exemplos de código real do projeto.
-
-### Diagramas
-
-Diagramas Mermaid ilustram arquitetura, fluxos e relacionamentos.
-
----
-
-## 🎯 Princípios da Documentação
-
-Esta documentação foi criada seguindo:
-
-✅ **Clareza**: Linguagem clara e acessível para todos os níveis  
-✅ **Progressividade**: Do geral para o específico  
-✅ **Exemplos Práticos**: Código real do projeto  
-✅ **Diagramas Visuais**: Facilitar compreensão  
-✅ **Atualização**: Baseada 100% no código existente  
-✅ **Profissionalismo**: Padrão sênior de documentação técnica  
-
----
-
-## 🔍 Recursos Adicionais
-
-### Swagger/OpenAPI
-
-Documentação interativa disponível quando a aplicação está rodando:
-- Development: http://localhost:8080
-
-### Código-Fonte
-
-Explore o código-fonte organizado por camadas:
 ```
-src/
-├── components/     # Componentes React (~200)
-├── contexts/       # Gerenciamento de estado global
-├── hooks/          # Custom hooks (28)
-├── pages/          # Páginas/Routes (36)
-├── integrations/   # Supabase client
-├── lib/            # Utilitários
-└── types/          # Definições TypeScript
-
-supabase/
-├── functions/      # Edge Functions (6)
-└── migrations/     # SQL migrations (14)
+📂 teste-inatel/
+│
+├── 📂 documentacao-projeto/     ← 📚 EXPLICAÇÃO COMPLETA DO PROJETO
+│   │                               (Comece por aqui se quiser entender tudo!)
+│   │
+│   ├── 01-VISAO-GERAL.md        ← O que o sistema faz (explicação simples)
+│   ├── 02-ARQUITETURA.md        ← Como o sistema foi construído
+│   ├── 03-FRONTEND.md           ← A parte visual (telas, botões)
+│   ├── 04-COMPONENTES.md        ← Peças que formam a interface
+│   ├── 05-SUPABASE.md           ← Onde os dados são guardados
+│   ├── 06-API.md                ← Como as partes se comunicam
+│   ├── 07-AUTENTICACAO.md       ← Login e permissões
+│   ├── 08-BANCO-DE-DADOS.md     ← Estrutura dos dados
+│   ├── 09-TESTES.md             ← Como testar o sistema
+│   ├── 10-DEPLOY.md             ← Como colocar no ar
+│   ├── 11-CONFIGURACAO.md       ← Configurações necessárias
+│   ├── 12-API-REFERENCE.md      ← Referência técnica da API
+│   ├── 13-GUIA-DESENVOLVIMENTO  ← Como rodar o projeto
+│   ├── 14-BOAS-PRATICAS.md      ← Regras de código
+│   ├── 15-TROUBLESHOOTING.md    ← Problemas e soluções
+│   └── 16-ROADMAP.md            ← Melhorias futuras
+│
+├── 📂 src/                      ← Código do frontend (React)
+├── 📂 supabase/                 ← Backend e banco de dados
+└── 📄 package.json              ← Dependências do projeto
 ```
 
 ---
 
-## 🗺️ Mapa de Navegação Rápida
+## 🚀 Como Rodar o Projeto
 
+### Passo 1: Instalar Node.js
+Baixe e instale o Node.js: https://nodejs.org/
+
+### Passo 2: Instalar dependências
+```bash
+npm install
 ```
-Documentação
-│
-├── 📘 Fundamentos
-│   ├── 01. Visão Geral
-│   └── 02. Arquitetura
-│
-├── 🎨 Frontend
-│   ├── 03. Frontend React
-│   └── 04. Componentes
-│
-├── 🔧 Backend
-│   ├── 05. Supabase
-│   ├── 06. API
-│   ├── 07. Autenticação
-│   └── 08. Banco de Dados
-│
-├── ✅ Qualidade
-│   └── 09. Testes
-│
-├── 🚀 Deploy
-│   ├── 10. Deploy e CI/CD
-│   └── 11. Configuração
-│
-└── 📚 Referência
-    ├── 12. API Reference
-    ├── 13. Guia de Desenvolvimento
-    ├── 14. Boas Práticas
-    ├── 15. Troubleshooting
-    └── 16. Roadmap
+
+### Passo 3: Configurar variáveis de ambiente
+Crie um arquivo `.env.local` na raiz com:
 ```
+VITE_SUPABASE_URL=sua_url_aqui
+VITE_SUPABASE_PUBLISHABLE_KEY=sua_chave_aqui
+```
+
+### Passo 4: Rodar o projeto
+```bash
+npm run dev
+```
+
+### Passo 5: Acessar no navegador
+Abra: http://localhost:8080
 
 ---
 
-**Versão da Documentação**: 1.0  
-**Última Atualização**: Janeiro 2026  
-**Framework**: React 18 + TypeScript + Vite  
-**Backend**: Supabase (PostgreSQL + Edge Functions)
+## 📚 Quer Entender Mais?
+
+### Se você é novo no projeto:
+1. Leia primeiro: [`documentacao-projeto/01-VISAO-GERAL.md`](documentacao-projeto/01-VISAO-GERAL.md)
+2. Depois: [`documentacao-projeto/13-GUIA-DESENVOLVIMENTO.md`](documentacao-projeto/13-GUIA-DESENVOLVIMENTO.md)
+
+### Se você quer entender como funciona:
+1. Arquitetura: [`documentacao-projeto/02-ARQUITETURA.md`](documentacao-projeto/02-ARQUITETURA.md)
+2. Frontend: [`documentacao-projeto/03-FRONTEND.md`](documentacao-projeto/03-FRONTEND.md)
+3. Backend: [`documentacao-projeto/05-SUPABASE.md`](documentacao-projeto/05-SUPABASE.md)
+
+### Se você está com problemas:
+1. Troubleshooting: [`documentacao-projeto/15-TROUBLESHOOTING.md`](documentacao-projeto/15-TROUBLESHOOTING.md)
 
 ---
 
-**Boa leitura e bom desenvolvimento! 🚀**
+## 🛠️ Tecnologias Usadas
+
+| Tecnologia | Para que serve |
+|------------|----------------|
+| **React** | Construir a interface (botões, telas) |
+| **TypeScript** | Linguagem de programação mais segura |
+| **Tailwind CSS** | Deixar a interface bonita |
+| **Supabase** | Guardar os dados e fazer login |
+| **Vite** | Rodar o projeto rapidamente |
+
+---
+
+## 👥 Para Quem é Este Projeto?
+
+- **Gestores de Frota** - Querem monitorar seus veículos
+- **Técnicos de Manutenção** - Precisam de alertas sobre problemas
+- **Operadores** - Usam o sistema no dia a dia
+- **Desenvolvedores** - Querem entender ou contribuir com o código
+
+---
+
+## 📞 Precisa de Ajuda?
+
+1. Leia a documentação em [`documentacao-projeto/`](documentacao-projeto/)
+2. Veja os problemas comuns em [`documentacao-projeto/15-TROUBLESHOOTING.md`](documentacao-projeto/15-TROUBLESHOOTING.md)
+
+---
+
+**Versão:** 1.0  
+**Última Atualização:** Janeiro 2026  
+**Desenvolvido com:** React + TypeScript + Supabase
