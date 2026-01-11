@@ -26,25 +26,25 @@ Imagine que você tem uma fazenda com 50 tratores. Cada trator tem pneus que pre
 ```
 📂 teste-inatel/
 │
-├── 📂 documentacao-projeto/     ← 📚 EXPLICAÇÃO COMPLETA DO PROJETO
-│   │                               (Comece por aqui se quiser entender tudo!)
+├── 📂 documentacao (como funciona o projeto)/     ← 📚 COMECE AQUI!
 │   │
-│   ├── 01-VISAO-GERAL.md        ← O que o sistema faz (explicação simples)
-│   ├── 02-ARQUITETURA.md        ← Como o sistema foi construído
-│   ├── 03-FRONTEND.md           ← A parte visual (telas, botões)
-│   ├── 04-COMPONENTES.md        ← Peças que formam a interface
-│   ├── 05-SUPABASE.md           ← Onde os dados são guardados
-│   ├── 06-API.md                ← Como as partes se comunicam
-│   ├── 07-AUTENTICACAO.md       ← Login e permissões
-│   ├── 08-BANCO-DE-DADOS.md     ← Estrutura dos dados
-│   ├── 09-TESTES.md             ← Como testar o sistema
-│   ├── 10-DEPLOY.md             ← Como colocar no ar
-│   ├── 11-CONFIGURACAO.md       ← Configurações necessárias
-│   ├── 12-API-REFERENCE.md      ← Referência técnica da API
-│   ├── 13-GUIA-DESENVOLVIMENTO  ← Como rodar o projeto
-│   ├── 14-BOAS-PRATICAS.md      ← Regras de código
-│   ├── 15-TROUBLESHOOTING.md    ← Problemas e soluções
-│   └── 16-ROADMAP.md            ← Melhorias futuras
+│   ├── 01-VISAO-GERAL (o que o sistema faz).md
+│   ├── 02-ARQUITETURA (como foi construido).md
+│   ├── 03-FRONTEND (a parte visual).md
+│   ├── 04-COMPONENTES (pecas da interface).md
+│   ├── 05-SUPABASE (onde os dados ficam).md
+│   ├── 06-API (comunicacao entre partes).md
+│   ├── 07-AUTENTICACAO (login e permissoes).md
+│   ├── 08-BANCO-DE-DADOS (estrutura dos dados).md
+│   ├── 09-TESTES (como testar).md
+│   ├── 10-DEPLOY (como colocar no ar).md
+│   ├── 11-CONFIGURACAO (configuracoes).md
+│   ├── 12-API-REFERENCE (referencia tecnica).md
+│   ├── 13-GUIA-DESENVOLVIMENTO (como rodar).md
+│   ├── 14-BOAS-PRATICAS (regras de codigo).md
+│   ├── 15-TROUBLESHOOTING (problemas e solucoes).md
+│   ├── 16-ROADMAP (melhorias futuras).md
+│   └── README (indice da documentacao).md
 │
 ├── 📂 src/                      ← Código do frontend (React)
 ├── 📂 supabase/                 ← Backend e banco de dados
@@ -83,16 +83,16 @@ Abra: http://localhost:8080
 ## 📚 Quer Entender Mais?
 
 ### Se você é novo no projeto:
-1. Leia primeiro: [`documentacao-projeto/01-VISAO-GERAL.md`](documentacao-projeto/01-VISAO-GERAL.md)
-2. Depois: [`documentacao-projeto/13-GUIA-DESENVOLVIMENTO.md`](documentacao-projeto/13-GUIA-DESENVOLVIMENTO.md)
+1. Leia primeiro: `01-VISAO-GERAL (o que o sistema faz).md`
+2. Depois: `13-GUIA-DESENVOLVIMENTO (como rodar).md`
 
 ### Se você quer entender como funciona:
-1. Arquitetura: [`documentacao-projeto/02-ARQUITETURA.md`](documentacao-projeto/02-ARQUITETURA.md)
-2. Frontend: [`documentacao-projeto/03-FRONTEND.md`](documentacao-projeto/03-FRONTEND.md)
-3. Backend: [`documentacao-projeto/05-SUPABASE.md`](documentacao-projeto/05-SUPABASE.md)
+1. Arquitetura: `02-ARQUITETURA (como foi construido).md`
+2. Frontend: `03-FRONTEND (a parte visual).md`
+3. Backend: `05-SUPABASE (onde os dados ficam).md`
 
 ### Se você está com problemas:
-1. Troubleshooting: [`documentacao-projeto/15-TROUBLESHOOTING.md`](documentacao-projeto/15-TROUBLESHOOTING.md)
+1. Troubleshooting: `15-TROUBLESHOOTING (problemas e solucoes).md`
 
 ---
 
@@ -119,8 +119,8 @@ Abra: http://localhost:8080
 
 ## 📞 Precisa de Ajuda?
 
-1. Leia a documentação em [`documentacao-projeto/`](documentacao-projeto/)
-2. Veja os problemas comuns em [`documentacao-projeto/15-TROUBLESHOOTING.md`](documentacao-projeto/15-TROUBLESHOOTING.md)
+1. Abra a pasta `documentacao (como funciona o projeto)/`
+2. Veja os problemas comuns em `15-TROUBLESHOOTING (problemas e solucoes).md`
 
 ---
 
