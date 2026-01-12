@@ -26,29 +26,40 @@ Imagine que você tem uma fazenda com 50 tratores. Cada trator tem pneus que pre
 ```
 📂 teste-inatel/
 │
-├── 📂 documentacao (como funciona o projeto)/     ← 📚 COMECE AQUI!
-│   │
-│   ├── 01-VISAO-GERAL (o que o sistema faz).md
-│   ├── 02-ARQUITETURA (como foi construido).md
-│   ├── 03-FRONTEND (a parte visual).md
-│   ├── 04-COMPONENTES (pecas da interface).md
-│   ├── 05-SUPABASE (onde os dados ficam).md
-│   ├── 06-API (comunicacao entre partes).md
-│   ├── 07-AUTENTICACAO (login e permissoes).md
-│   ├── 08-BANCO-DE-DADOS (estrutura dos dados).md
-│   ├── 09-TESTES (como testar).md
-│   ├── 10-DEPLOY (como colocar no ar).md
-│   ├── 11-CONFIGURACAO (configuracoes).md
-│   ├── 12-API-REFERENCE (referencia tecnica).md
-│   ├── 13-GUIA-DESENVOLVIMENTO (como rodar).md
-│   ├── 14-BOAS-PRATICAS (regras de codigo).md
-│   ├── 15-TROUBLESHOOTING (problemas e solucoes).md
-│   ├── 16-ROADMAP (melhorias futuras).md
-│   └── README (indice da documentacao).md
+├── 📂 docs/                         ← 📚 DOCUMENTAÇÃO TÉCNICA
+│   ├── README.md                    # Índice da documentação
+│   ├── 01-VISAO-GERAL/             # O que o sistema faz
+│   ├── 02-ARQUITETURA/             # Como foi construído
+│   │   ├── c4/                     # Diagramas C4
+│   │   ├── adrs/                   # Architecture Decision Records
+│   │   └── nfrs/                   # Non-Functional Requirements
+│   ├── 03-FRONTEND/                # A parte visual
+│   │   ├── design-system/          # Sistema de design
+│   │   ├── padroes/                # Padrões de código
+│   │   └── exemplos/               # Exemplos de uso
+│   ├── 04-COMPONENTES/             # Peças da interface
+│   ├── 05-DADOS/                   # Supabase e dados
+│   ├── 06-API/                     # Comunicação entre partes
+│   ├── 07-AUTENTICACAO/            # Login e permissões
+│   ├── 08-BANCO-DE-DADOS/          # Estrutura dos dados
+│   ├── 09-TESTES/                  # Como testar
+│   ├── 10-DEPLOY/                  # Como colocar no ar
+│   ├── 11-CONFIGURACAO/            # Configurações
+│   ├── 12-API-REFERENCE/           # Referência técnica
+│   ├── 13-GUIA-DESENVOLVIMENTO/    # Como rodar
+│   ├── 14-BOAS-PRATICAS/           # Regras de código
+│   ├── 15-TROUBLESHOOTING/         # Problemas e soluções
+│   ├── 16-ROADMAP/                 # Melhorias futuras
+│   ├── templates/                  # Templates de documentos
+│   └── assets/                     # Imagens e diagramas
 │
-├── 📂 src/                      ← Código do frontend (React)
-├── 📂 supabase/                 ← Backend e banco de dados
-└── 📄 package.json              ← Dependências do projeto
+├── 📂 src/                          ← Código do frontend (React)
+├── 📂 supabase/                     ← Backend e banco de dados
+├── 📄 CONTRIBUTING.md               ← Como contribuir
+├── 📄 SECURITY.md                   ← Política de segurança
+├── 📄 CHANGELOG.md                  ← Histórico de mudanças
+├── 📄 .editorconfig                 ← Padrão de formatação
+└── 📄 package.json                  ← Dependências do projeto
 ```
 
 ---
@@ -80,19 +91,21 @@ Abra: http://localhost:8080
 
 ---
 
-## 📚 Quer Entender Mais?
+## 📚 Documentação
+
+A documentação completa está em [`docs/`](docs/README.md).
 
 ### Se você é novo no projeto:
-1. Leia primeiro: `01-VISAO-GERAL (o que o sistema faz).md`
-2. Depois: `13-GUIA-DESENVOLVIMENTO (como rodar).md`
+1. Leia primeiro: [`docs/01-VISAO-GERAL/`](docs/01-VISAO-GERAL/)
+2. Depois: [`docs/13-GUIA-DESENVOLVIMENTO/`](docs/13-GUIA-DESENVOLVIMENTO/)
 
 ### Se você quer entender como funciona:
-1. Arquitetura: `02-ARQUITETURA (como foi construido).md`
-2. Frontend: `03-FRONTEND (a parte visual).md`
-3. Backend: `05-SUPABASE (onde os dados ficam).md`
+1. Arquitetura: [`docs/02-ARQUITETURA/`](docs/02-ARQUITETURA/)
+2. Frontend: [`docs/03-FRONTEND/`](docs/03-FRONTEND/)
+3. Backend: [`docs/05-DADOS/`](docs/05-DADOS/)
 
 ### Se você está com problemas:
-1. Troubleshooting: `15-TROUBLESHOOTING (problemas e solucoes).md`
+1. Troubleshooting: [`docs/15-TROUBLESHOOTING/`](docs/15-TROUBLESHOOTING/)
 
 ---
 
@@ -119,8 +132,9 @@ Abra: http://localhost:8080
 
 ## 📞 Precisa de Ajuda?
 
-1. Abra a pasta `documentacao (como funciona o projeto)/`
-2. Veja os problemas comuns em `15-TROUBLESHOOTING (problemas e solucoes).md`
+1. Veja a documentação em [`docs/`](docs/README.md)
+2. Veja os problemas comuns em [`docs/15-TROUBLESHOOTING/`](docs/15-TROUBLESHOOTING/)
+3. Leia [CONTRIBUTING.md](CONTRIBUTING.md) para contribuir
 
 ---
 

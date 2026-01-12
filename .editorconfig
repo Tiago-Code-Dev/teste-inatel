@@ -1,0 +1,43 @@
+# EditorConfig - https://editorconfig.org
+
+root = true
+
+# Configuração padrão para todos os arquivos
+[*]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+# TypeScript/JavaScript
+[*.{ts,tsx,js,jsx}]
+indent_size = 2
+
+# JSON
+[*.json]
+indent_size = 2
+
+# YAML
+[*.{yml,yaml}]
+indent_size = 2
+
+# Markdown
+[*.md]
+trim_trailing_whitespace = false
+
+# SQL
+[*.sql]
+indent_size = 2
+
+# Shell scripts
+[*.sh]
+indent_size = 2
+
+# Configurações específicas
+[package.json]
+indent_size = 2
+
+[tsconfig*.json]
+indent_size = 2
