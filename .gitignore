@@ -25,3 +25,4 @@ dist-ssr
 
 # BMAD Method - manter local, não versionar no GitHub
 _bmad/
+.cursor/rules/bmad/
