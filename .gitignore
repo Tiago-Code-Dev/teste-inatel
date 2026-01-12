@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# BMAD Method - manter local, não versionar no GitHub
+_bmad/
