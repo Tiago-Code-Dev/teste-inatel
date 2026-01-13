@@ -152,10 +152,20 @@ O coração do sistema - coleta e processamento de dados dos sensores.
 Ferramentas para análise de dados e tomada de decisão.
 
 **Recursos:**
-- **Analytics Avançados**: Gráficos de tendência, distribuição de alertas
-- **Business Intelligence**: KPIs, métricas de performance
-- **Relatórios de Custos**: Quanto você está gastando com manutenção
+- **Analytics Avançados**: Gráficos de tendência, distribuição de alertas (`/analytics`)
+- **Business Intelligence**: KPIs, métricas de performance (`/bi`)
+- **Gestão de Custos**: Quanto você está gastando com manutenção (`/costs`)
 - **Insights de IA**: Previsões e recomendações geradas por inteligência artificial
+
+### 6.1 Análises Especializadas de Pneus
+
+O sistema oferece análises detalhadas para cada aspecto dos pneus:
+
+- **Calibração** (`/calibration`): Monitoramento de calibragem com alertas automáticos
+- **Deformação** (`/deformation`): Detecção de problemas estruturais nos pneus
+- **Desgaste** (`/wear`): Análise de padrões de desgaste e previsão de vida útil
+- **Lastro de Fluido** (`/fluid`): Monitoramento de lastro líquido em pneus agrícolas
+- **Análise de Carga** (`/load`): Distribuição de peso e impacto nos pneus
 
 ### 7. Geolocalização
 
@@ -172,10 +182,31 @@ Veja onde suas máquinas estão no mapa.
 Registro de incidentes e manutenções.
 
 **O que você pode fazer:**
-- Registrar ocorrências com descrição detalhada
+- Registrar ocorrências com descrição detalhada (`/occurrences/new`)
 - Anexar fotos, áudios e vídeos
-- Acompanhar status de resolução
+- Acompanhar status de resolução (`/occurrences`)
 - Funciona offline (sincroniza quando voltar a ter internet)
+
+### 9. Dispositivos IoT
+
+Gestão dos sensores instalados nas máquinas e pneus.
+
+**Funcionalidades:**
+- Lista de todos os dispositivos cadastrados (`/devices`)
+- Cadastro de novos sensores (`/devices/new`)
+- Monitoramento de status de comunicação
+- Configuração remota de parâmetros
+- Histórico de operação por dispositivo
+
+### 10. Operações de Equipe
+
+Gestão de tarefas e atividades da equipe operacional.
+
+**O que você pode fazer:**
+- Atribuir tarefas a funcionários (`/team-operations`)
+- Acompanhar progresso de atividades
+- Feed de atividades da equipe
+- Filtros por status e prioridade
 
 ## Stack Tecnológica
 
@@ -356,7 +387,8 @@ Para começar a trabalhar com o sistema:
 
 ---
 
-**Versão do Sistema**: 1.0  
-**Última Atualização**: Janeiro 2026  
+**Versão do Sistema**: 2.0  
+**Última Atualização**: 12/Janeiro/2026  
 **Framework**: React 18 + TypeScript + Vite  
-**Backend**: Supabase (PostgreSQL + Edge Functions)
+**Backend**: Supabase (PostgreSQL + Edge Functions)  
+**Módulos**: 10 módulos funcionais | 24+ rotas | 200+ componentes

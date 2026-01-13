@@ -227,10 +227,11 @@ docs/
 
 ---
 
-**Versão da Documentação**: 1.0  
-**Última Atualização**: Janeiro 2026  
+**Versão da Documentação**: 2.0  
+**Última Atualização**: 12/Janeiro/2026  
 **Framework**: React 18 + TypeScript + Vite  
-**Backend**: Supabase (PostgreSQL + Edge Functions)
+**Backend**: Supabase (PostgreSQL + Edge Functions)  
+**Módulos**: 10 módulos funcionais | 24+ rotas | 200+ componentes
 
 ---
 
