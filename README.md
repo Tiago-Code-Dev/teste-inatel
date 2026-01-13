@@ -26,40 +26,40 @@ Imagine que você tem uma fazenda com 50 tratores. Cada trator tem pneus que pre
 ```
 📂 teste-inatel/
 │
-├── 📂 docs/                         ← 📚 DOCUMENTAÇÃO TÉCNICA
-│   ├── README.md                    # Índice da documentação
-│   ├── 01-VISAO-GERAL/             # O que o sistema faz
-│   ├── 02-ARQUITETURA/             # Como foi construído
-│   │   ├── c4/                     # Diagramas C4
-│   │   ├── adrs/                   # Architecture Decision Records
-│   │   └── nfrs/                   # Non-Functional Requirements
-│   ├── 03-FRONTEND/                # A parte visual
-│   │   ├── design-system/          # Sistema de design
-│   │   ├── padroes/                # Padrões de código
-│   │   └── exemplos/               # Exemplos de uso
-│   ├── 04-COMPONENTES/             # Peças da interface
-│   ├── 05-DADOS/                   # Supabase e dados
-│   ├── 06-API/                     # Comunicação entre partes
-│   ├── 07-AUTENTICACAO/            # Login e permissões
-│   ├── 08-BANCO-DE-DADOS/          # Estrutura dos dados
-│   ├── 09-TESTES/                  # Como testar
-│   ├── 10-DEPLOY/                  # Como colocar no ar
-│   ├── 11-CONFIGURACAO/            # Configurações
-│   ├── 12-API-REFERENCE/           # Referência técnica
-│   ├── 13-GUIA-DESENVOLVIMENTO/    # Como rodar
-│   ├── 14-BOAS-PRATICAS/           # Regras de código
-│   ├── 15-TROUBLESHOOTING/         # Problemas e soluções
-│   ├── 16-ROADMAP/                 # Melhorias futuras
-│   ├── templates/                  # Templates de documentos
-│   └── assets/                     # Imagens e diagramas
+├── 📂 docs/                         ← 📚 OS MANUAIS DO PROJETO
+│   ├── README.md                    # 📖 Sumário dos manuais
+│   ├── 01-VISAO-GERAL/             # 👀 Explica o que o sistema faz
+│   ├── 02-ARQUITETURA/             # 🏗️ Como a casa foi construída
+│   │   ├── c4/                     # 🗺️ Mapas do sistema
+│   │   ├── adrs/                   # 📝 Por que escolhemos cada coisa
+│   │   └── nfrs/                   # 📋 Regras de qualidade
+│   ├── 03-FRONTEND/                # 🎨 A parte bonita que você vê
+│   │   ├── design-system/          # 🎨 Cores e estilos
+│   │   ├── padroes/                # 📏 Regras de como escrever código
+│   │   └── exemplos/               # 💡 Exemplos para copiar
+│   ├── 04-COMPONENTES/             # 🧩 As peças da interface (botões, cards)
+│   ├── 05-DADOS/                   # 💾 Onde guardamos as informações
+│   ├── 06-API/                     # 📡 Como as partes conversam entre si
+│   ├── 07-AUTENTICACAO/            # 🔐 Login e quem pode fazer o quê
+│   ├── 08-BANCO-DE-DADOS/          # 🗄️ O armário onde guardamos tudo
+│   ├── 09-TESTES/                  # ✅ Como verificar se funciona
+│   ├── 10-DEPLOY/                  # 🚀 Como colocar na internet
+│   ├── 11-CONFIGURACAO/            # ⚙️ Ajustes do sistema
+│   ├── 12-API-REFERENCE/           # 📚 Dicionário técnico
+│   ├── 13-GUIA-DESENVOLVIMENTO/    # 🏃 Como rodar no seu computador
+│   ├── 14-BOAS-PRATICAS/           # ⭐ As regras do jogo
+│   ├── 15-TROUBLESHOOTING/         # 🔧 Socorro! Algo deu errado
+│   ├── 16-ROADMAP/                 # 🛣️ O que vamos fazer no futuro
+│   ├── templates/                  # 📋 Modelos prontos para copiar
+│   └── assets/                     # 🖼️ Imagens e desenhos
 │
-├── 📂 src/                          ← Código do frontend (React)
-├── 📂 supabase/                     ← Backend e banco de dados
-├── 📄 CONTRIBUTING.md               ← Como contribuir
-├── 📄 SECURITY.md                   ← Política de segurança
-├── 📄 CHANGELOG.md                  ← Histórico de mudanças
-├── 📄 .editorconfig                 ← Padrão de formatação
-└── 📄 package.json                  ← Dependências do projeto
+├── 📂 src/                          ← 🧠 O CÉREBRO (todo o código)
+├── 📂 supabase/                     ← 🗄️ O ARMÁRIO (banco de dados)
+├── 📄 CONTRIBUTING.md               ← 🤝 Como você pode ajudar
+├── 📄 SECURITY.md                   ← 🚨 O que fazer se achar um problema
+├── 📄 CHANGELOG.md                  ← 📅 Diário das mudanças
+├── 📄 .editorconfig                 ← 📏 Régua para o código ficar bonito
+└── 📄 package.json                  ← 🥗 Lista de ingredientes
 ```
 
 ---
