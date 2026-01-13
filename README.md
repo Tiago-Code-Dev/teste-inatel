@@ -64,33 +64,32 @@ Imagine que você tem uma fazenda com 50 tratores. Cada trator tem pneus que pre
 
 ---
 
-## 📖 O que cada arquivo/pasta faz? (Explicação para Leigos)
+## 📖 O que cada arquivo/pasta faz? (Explicação Super Simples)
 
-| Arquivo/Pasta | O que é? (explicação simples) |
-|---------------|-------------------------------|
-| 📁 **.github** | Configurações do GitHub (automações quando você faz upload de código) |
-| 📁 **docs** | Documentação - os "manuais de instruções" do projeto |
-| 📁 **infra/docker** | Infraestrutura - configurações para rodar em servidores na nuvem |
-| 📁 **public** | Arquivos públicos - ícone do site e imagens que aparecem no navegador |
-| 📁 **scripts** | Scripts auxiliares - comandos automáticos para tarefas repetitivas |
-| 📁 **specsproduct-spec.md** | Especificação do Produto (PRD) - documento que define O QUE o sistema faz |
-| 📁 **src** | Código-fonte - onde está toda a programação (o "cérebro" do sistema) |
-| 📁 **tests** | Testes - código que verifica se tudo está funcionando corretamente |
-| 📄 **.editorconfig** | Padrão do editor - mantém a formatação igual para todos os programadores |
-| 📄 **.env** | Variáveis secretas - senhas e chaves de acesso (NÃO vai para o GitHub) |
-| 📄 **.gitignore** | Lista de ignorados - arquivos que não devem ir para o GitHub |
-| 📄 **CHANGELOG.md** | Histórico de mudanças - lista do que mudou em cada versão |
-| 📄 **CONTRIBUTING.md** | Guia de contribuição - como você pode ajudar no projeto |
-| 📄 **README.md** | Este arquivo! - apresentação e instruções iniciais |
-| 📄 **SECURITY.md** | Segurança - como reportar problemas de segurança |
-| 📄 **bun.lockb** | Trava de versões - garante que todos usem as mesmas bibliotecas |
-| 📄 **components.json** | Configuração visual - define os componentes de interface (botões, cards) |
-| 📄 **eslint.config.js** | Verificador de código - encontra erros e mantém padrão de escrita |
-| 📄 **index.html** | Página inicial - o HTML que carrega o sistema no navegador |
-| 📄 **package.json** | Lista de ingredientes - nome do projeto e bibliotecas usadas |
-| 📄 **package-lock.json** | Receita exata - versões específicas de cada biblioteca |
-| 📄 **postcss.config.js** | Processador CSS - transforma estilos automaticamente |
-| 📄 **tailwind.config.ts** | Configuração de design - cores, fontes e espaçamentos do sistema |
+| Arquivo/Pasta | O que é? 🧒 |
+|---------------|-------------|
+| 📁 **.github** | É como um **robô ajudante** que faz tarefas automáticas quando você salva o código |
+| 📁 **docs** | São os **livros de instruções** - explicam como tudo funciona |
+| 📁 **infra/docker** | É a **caixa mágica** que faz o sistema rodar em qualquer computador |
+| 📁 **public** | É a **vitrine da loja** - o ícone e imagens que você vê no navegador |
+| 📁 **scripts** | São **receitas prontas** - comandos que fazem tarefas chatas sozinhos |
+| 📁 **specsproduct-spec.md** | É o **desenho do arquiteto** - mostra o que o sistema deve fazer |
+| 📁 **src** | É o **cérebro** 🧠 - todo o código que faz o sistema pensar e funcionar |
+| 📁 **tests** | É o **professor que corrige a prova** - verifica se tudo funciona certo |
+| 📄 **.editorconfig** | É a **régua** - mantém o código bonito e organizado igual para todos |
+| 📄 **.env** | É o **cofre secreto** 🔐 - guarda senhas (não aparece na internet!) |
+| 📄 **CHANGELOG.md** | É o **diário** - conta o que mudou em cada versão |
+| 📄 **CONTRIBUTING.md** | É o **convite** - explica como você pode ajudar no projeto |
+| 📄 **README.md** | É o **cartão de visita** 👋 - este arquivo que você está lendo! |
+| 📄 **SECURITY.md** | É o **alarme** 🚨 - diz como avisar se encontrar um problema de segurança |
+| 📄 **bun.lockb** | É a **lista de compras com marcas** - garante que todos usem as mesmas coisas |
+| 📄 **components.json** | É o **catálogo de peças** - lista os botões, cards e caixas do sistema |
+| 📄 **eslint.config.js** | É o **corretor ortográfico** ✏️ - encontra erros no código |
+| 📄 **index.html** | É a **porta de entrada** 🚪 - a primeira página que abre no navegador |
+| 📄 **package.json** | É a **lista de ingredientes** 🥗 - tudo que o projeto precisa para funcionar |
+| 📄 **package-lock.json** | É a **receita detalhada** - versão exata de cada ingrediente |
+| 📄 **postcss.config.js** | É o **pintor** 🎨 - transforma as cores e estilos automaticamente |
+| 📄 **tailwind.config.ts** | É a **paleta de cores** 🌈 - define as cores, letras e espaços do design |
 
 ### 🎯 Resumo Visual (o mais importante)
 
