@@ -64,6 +64,50 @@ Imagine que você tem uma fazenda com 50 tratores. Cada trator tem pneus que pre
 
 ---
 
+## 📖 O que cada arquivo/pasta faz? (Explicação para Leigos)
+
+| Arquivo/Pasta | O que é? (explicação simples) |
+|---------------|-------------------------------|
+| 📁 **.github** | Configurações do GitHub (automações quando você faz upload de código) |
+| 📁 **docs** | Documentação - os "manuais de instruções" do projeto |
+| 📁 **infra/docker** | Infraestrutura - configurações para rodar em servidores na nuvem |
+| 📁 **public** | Arquivos públicos - ícone do site e imagens que aparecem no navegador |
+| 📁 **scripts** | Scripts auxiliares - comandos automáticos para tarefas repetitivas |
+| 📁 **specsproduct-spec.md** | Especificação do Produto (PRD) - documento que define O QUE o sistema faz |
+| 📁 **src** | Código-fonte - onde está toda a programação (o "cérebro" do sistema) |
+| 📁 **tests** | Testes - código que verifica se tudo está funcionando corretamente |
+| 📄 **.editorconfig** | Padrão do editor - mantém a formatação igual para todos os programadores |
+| 📄 **.env** | Variáveis secretas - senhas e chaves de acesso (NÃO vai para o GitHub) |
+| 📄 **.gitignore** | Lista de ignorados - arquivos que não devem ir para o GitHub |
+| 📄 **CHANGELOG.md** | Histórico de mudanças - lista do que mudou em cada versão |
+| 📄 **CONTRIBUTING.md** | Guia de contribuição - como você pode ajudar no projeto |
+| 📄 **README.md** | Este arquivo! - apresentação e instruções iniciais |
+| 📄 **SECURITY.md** | Segurança - como reportar problemas de segurança |
+| 📄 **bun.lockb** | Trava de versões - garante que todos usem as mesmas bibliotecas |
+| 📄 **components.json** | Configuração visual - define os componentes de interface (botões, cards) |
+| 📄 **eslint.config.js** | Verificador de código - encontra erros e mantém padrão de escrita |
+| 📄 **index.html** | Página inicial - o HTML que carrega o sistema no navegador |
+| 📄 **package.json** | Lista de ingredientes - nome do projeto e bibliotecas usadas |
+| 📄 **package-lock.json** | Receita exata - versões específicas de cada biblioteca |
+| 📄 **postcss.config.js** | Processador CSS - transforma estilos automaticamente |
+| 📄 **tailwind.config.ts** | Configuração de design - cores, fontes e espaçamentos do sistema |
+
+### 🎯 Resumo Visual (o mais importante)
+
+```
+📦 TireWatch Pro
+│
+├── 📁 src/            → "O CÉREBRO" - Todo o código do sistema
+├── 📁 docs/           → "OS MANUAIS" - Documentação para entender o projeto
+├── 📁 specsproduct-spec.md/ → "O CONTRATO" - O que o sistema deve fazer
+│
+├── 📄 README.md       → "CARTÃO DE VISITA" - Você está lendo agora!
+├── 📄 package.json    → "LISTA DE INGREDIENTES" - Bibliotecas usadas
+└── 📄 .env            → "COFRE" - Senhas (não aparece no GitHub)
+```
+
+---
+
 ## 🚀 Como Rodar o Projeto
 
 ### Passo 1: Instalar Node.js
@@ -138,6 +182,6 @@ A documentação completa está em [`docs/`](docs/README.md).
 
 ---
 
-**Versão:** 1.0  
-**Última Atualização:** Janeiro 2026  
-**Desenvolvido com:** React + TypeScript + Supabase
+**Versão:** 2.0  
+**Última Atualização:** 12/Janeiro/2026  
+**Desenvolvido com:** React 18 + TypeScript + Supabase + Tailwind CSS
